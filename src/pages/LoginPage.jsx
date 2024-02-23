@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 
 import { useAuthContext } from "@asgardeo/auth-react";
 import { ThreeDots } from "react-loader-spinner";

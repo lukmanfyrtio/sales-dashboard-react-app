@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, {  useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "@asgardeo/auth-react";
 import { ThreeDots } from "react-loader-spinner";
@@ -25,7 +25,7 @@ function SuccessLogin() {
                 });
                 navigate("/dashboard")
         }
-    }, [state.isAuthenticated])
+    }, [state.isAuthenticated,getAccessToken,navigate])
 
 
 

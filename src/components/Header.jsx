@@ -9,7 +9,7 @@ import { Button } from "@mui/material";
 import { useAuthContext } from "@asgardeo/auth-react";
 
 import home from "../assets/images/home.png";
-import profpic from "../assets/images/user-mgt.png";
+import profpic from "../assets/images/user-default.png";
 import prospek from "../assets/images/prospek.png";
 import invoice from "../assets/images/invoice.png";
 import target from "../assets/images/target-ex.png";
@@ -46,7 +46,7 @@ function Header() {
       }
 
     }
-  }, [state.isAuthenticated])
+  }, [state.isAuthenticated,getBasicUserInfo,photoUrl])
   useEffect(() => {
     //running the api call on first render/refresh
     startTime();
@@ -112,7 +112,7 @@ function Header() {
         <div className="container">
           <div className="left-header-dash">
             <div className="menu-btn" >
-              <span class="material-symbols-outlined" style={{ cursor: "pointer" }} onClick={() => setOpen(open === true ? false : true)}>
+              <span className="material-symbols-outlined" style={{ cursor: "pointer" }} onClick={() => setOpen(open === true ? false : true)}>
                 menu_open
               </span>
             </div>
@@ -201,7 +201,7 @@ function Header() {
                       : ""
                   }
                 >
-                  <img src={val.icon} />
+                  <img src={val.icon} alt=""/>
                   {val.label}
                 </li>
               );
