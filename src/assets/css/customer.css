@@ -1,0 +1,43 @@
+.tittle-content{
+    flex-direction: row;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-weight: 600;
+    color: #173370;
+    font-size: larger;
+}
+
+.search-bar>input{
+    font-size: 0.7rem;
+    font-family: "Poppins";
+    font-style: italic;
+}
+
+
+.search-bar {
+    /* Search */
+    /* Auto layout */
+  
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 16px;
+  
+    position: static;
+  
+    background: #ffffff;
+    border: 1px solid #dfe5f3;
+    box-sizing: border-box;
+    box-shadow: 0px 4px 4px rgba(12, 117, 214, 0.08);
+    border-radius: 8px;
+  
+    /* Inside auto layout */
+  
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    /* margin: 0px 24px; */
+    color: #173370;
+  }
