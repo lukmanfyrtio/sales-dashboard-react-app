@@ -8,6 +8,7 @@ import { useAuthContext } from '@asgardeo/auth-react';
 import DetailDashboard from './pages/DetailDashboard.jsx';
 import CustomerPage from './pages/CustomerPage.jsx';
 import CustomerAdd from './pages/CustomerAdd.jsx';
+import CustomerUpload from './pages/CustomerUpload.jsx';
 
 
 
@@ -32,6 +33,7 @@ function App() {
               <Route exact path="/customer" element={<CustomerPage />} />
               <Route exact path="/customer/add" element={<CustomerAdd />} />
               <Route exact path="/customer/edit" element={<CustomerAdd />} />
+              <Route exact path="/customer/upload" element={<CustomerUpload />} />
 
               <Route exact path="/login" element={<SuccessLogin />} />
             </>
