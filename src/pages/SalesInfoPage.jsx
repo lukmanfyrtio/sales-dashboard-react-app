@@ -55,7 +55,7 @@ function SalesInfoPage() {
     },
   };
 
-  const BUPLists = localStorage.bup==="ALL"?["SWAMEDIA", "MOTIO", "SWADAMA"]:[localStorage.bup];
+  const BUPLists = localStorage.bup === "ALL" ? ["SWAMEDIA", "MOTIO", "SWADAMA"] : [localStorage.bup];
 
   const [BUP, setBUP] = React.useState(
     localStorage.bup === "ALL" ? "" : localStorage.bup
@@ -107,9 +107,8 @@ function SalesInfoPage() {
     axios
       .delete(apis.server + `/invoice/delete/${id}`, {
         headers: {
-          Authorization: `Bearer ${
-            localStorage.token ? localStorage.token : ""
-          }`,
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
         },
       })
       .then((res) => {
@@ -146,9 +145,8 @@ function SalesInfoPage() {
           size: rowsPerPage,
         },
         headers: {
-          Authorization: `Bearer ${
-            localStorage.token ? localStorage.token : ""
-          }`,
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
         },
       })
       .then((res) => {
@@ -252,9 +250,8 @@ function SalesInfoPage() {
                       axios
                         .delete(apis.server + `/invoice/deleteall`, {
                           headers: {
-                            Authorization: `Bearer ${
-                              localStorage.token ? localStorage.token : ""
-                            }`,
+                            Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+                              }`,
                           },
                         })
                         .then((res) => {
@@ -356,9 +353,8 @@ function SalesInfoPage() {
 
                     method,
                     headers: {
-                      Authorization: `Bearer ${
-                        localStorage.token ? localStorage.token : ""
-                      }`,
+                      Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+                        }`,
                     },
 
                     responseType: "blob", //important
@@ -372,8 +368,21 @@ function SalesInfoPage() {
                     const link = document.createElement("a");
 
                     link.href = downloadUrl;
+                    const currentDate = new Date();
 
-                    link.setAttribute("download", "InvoiceWithAging.xlsx"); //any other extension
+                    const year = currentDate.getFullYear();
+                    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                    const day = String(currentDate.getDate()).padStart(2, '0');
+                    const hours = String(currentDate.getHours()).padStart(2, '0');
+                    const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+                    const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+
+                    // Create the formatted timestamp
+                    const formattedTimestamp = `${year}${month}${day}${hours}${minutes}${seconds}`;
+
+                    // Create the static string with the timestamp
+                    const staticString = `Sales_${formattedTimestamp}`;
+                    link.setAttribute("download", staticString+".xlsx"); //any other extension
 
                     document.body.appendChild(link);
 
@@ -393,14 +402,14 @@ function SalesInfoPage() {
               className="button-c"
               onClick={() => {
                 if (deletePr == 1) {
-                setOpen(true);
-                setModalTittle("Warning - Delete ALL");
-                setModalMessage(
-                  "Apakah anda yakin ingin menghapus semua data ?"
-                );
-              } else {
-                navigate("/403");
-              }
+                  setOpen(true);
+                  setModalTittle("Warning - Delete ALL");
+                  setModalMessage(
+                    "Apakah anda yakin ingin menghapus semua data ?"
+                  );
+                } else {
+                  navigate("/403");
+                }
               }}
             >
               <div className="btn-padding">
@@ -437,10 +446,10 @@ function SalesInfoPage() {
                   </StyledTableCell>
                   <StyledTableCell align="center">Tanggal Invoice</StyledTableCell>
                   <StyledTableCell align="center">
-                  Tanggal Invoice diterima Tenant
+                    Tanggal Invoice diterima Tenant
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                  Tanggal Jatuh Tempo
+                    Tanggal Jatuh Tempo
                   </StyledTableCell>
                   <StyledTableCell align="center">
                     Pokok Penerimaan (Rp)

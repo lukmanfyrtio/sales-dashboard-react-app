@@ -456,7 +456,22 @@ function CustomerPage() {
 
                     link.href = downloadUrl;
 
-                    link.setAttribute("download", "Customer.xlsx"); //any other extension
+                    const currentDate = new Date();
+
+                    // Get individual components of the date and time
+                    const year = currentDate.getFullYear();
+                    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                    const day = String(currentDate.getDate()).padStart(2, '0');
+                    const hours = String(currentDate.getHours()).padStart(2, '0');
+                    const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+                    const seconds = String(currentDate.getSeconds()).padStart(2, '0');
+
+                    // Create the formatted timestamp
+                    const formattedTimestamp = `${year}${month}${day}${hours}${minutes}${seconds}`;
+
+                    // Create the static string with the timestamp
+                    const staticString = `Customer_${formattedTimestamp}`;
+                    link.setAttribute("download", staticString+".xlsx"); //any other extension
 
                     document.body.appendChild(link);
 
