@@ -136,7 +136,7 @@ function Header() {
           </div>
           <div className="right-header-dash">
             <div>
-              <div style={{margin:"13x"}}>
+              <div>
                 <IconButton
                   aria-controls={openPopup ? "basic-menu" : undefined}
                   aria-haspopup="true"
