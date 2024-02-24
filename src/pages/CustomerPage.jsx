@@ -118,6 +118,7 @@ function CustomerPage() {
 
   const handleDelete = (id) => {
     setOpenLoad(true);
+    setOpen(false)
     axios
       .delete(apis.server + `/dashboard/delete/${id}`, {
         headers: {
