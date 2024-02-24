@@ -11,6 +11,8 @@ import CustomerAdd from './pages/CustomerAdd.jsx';
 import CustomerUpload from './pages/CustomerUpload.jsx';
 import SalesInfoPage from './pages/SalesInfoPage.jsx';
 import SalesInfoAdd from './pages/SalesInfoAdd.jsx';
+import SalesTargetPage from './pages/SalesTargetPage.jsx';
+import SalesTargetAdd from './pages/SalesTargetAdd.jsx';
 
 
 
@@ -40,6 +42,10 @@ function App() {
               <Route exact path="/sales" element={<SalesInfoPage />} />
               <Route exact path="/sales/add" element={<SalesInfoAdd />} />
               <Route exact path="/sales/edit" element={<SalesInfoAdd />} />
+              
+              <Route exact path="/sales-target" element={<SalesTargetPage />} />
+              <Route exact path="/sales-target/add" element={<SalesTargetAdd />} />
+              <Route exact path="/sales-target/edit" element={<SalesTargetAdd />} />
 
               <Route exact path="/login" element={<SuccessLogin />} />
             </>
