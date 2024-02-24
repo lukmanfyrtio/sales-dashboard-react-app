@@ -531,7 +531,7 @@ function CustomerAdd(props) {
                   </div>
                 </div>
                 <div className="input-i">
-                  <label>BUP</label>
+                  <label>Company</label>
                   <div className="input-i-txt">
                     <FormControl fullWidth>
                       <Select
@@ -554,7 +554,7 @@ function CustomerAdd(props) {
                         inputProps={{ "aria-label": "Without label" }}
                       >
                         <MenuItem key="BUP" value="BUP" style={getStyles()}>
-                          <em>Pilih BUP</em>
+                          <em>Pilih Company</em>
                         </MenuItem>
                         {BUPLists.map((name) => (
                           <MenuItem key={name} value={name} style={getStyles()}>

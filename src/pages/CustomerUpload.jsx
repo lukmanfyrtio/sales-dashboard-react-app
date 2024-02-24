@@ -241,7 +241,7 @@ function CustomerUpload() {
               <Table sx={{ minWidth: 700 }} aria-label="customized table">
                 <TableHead>
                   <TableRow>
-                    <StyledTableCell>BUP</StyledTableCell>
+                    <StyledTableCell>Company</StyledTableCell>
                     <StyledTableCell align="center">Nama Sales</StyledTableCell>
                     <StyledTableCell align="center">
                       Calon Pelanggan
