@@ -2,18 +2,24 @@ import React, { useEffect } from "react";
 
 import { useAuthContext } from "@asgardeo/auth-react";
 import { ThreeDots } from "react-loader-spinner";
+import { useNavigate } from "react-router-dom";
 
 
 
 function LoginPage() {
     const {
         signIn,
+        state
     } = useAuthContext();
-
+    const navigate = useNavigate();
 
     useEffect(() => {
-        signIn();
-    }, [])
+        if (window.location.pathname === "/login") {
+            console.log(state.isAuthenticated);
+        } else {
+            signIn();
+        }
+    }, [state.isAuthenticated])
 
 
     return (

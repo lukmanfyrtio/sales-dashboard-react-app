@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from './pages/LoginPage';
 import ForbiddenPage from './pages/ForbiddenPage';
 import AdminDashboard from './pages/AdminDashboard';
@@ -46,10 +46,13 @@ function App() {
               <Route exact path="/sales-target" element={<SalesTargetPage />} />
               <Route exact path="/sales-target/add" element={<SalesTargetAdd />} />
               <Route exact path="/sales-target/edit" element={<SalesTargetAdd />} />
-
               <Route exact path="/login" element={<SuccessLogin />} />
             </>
-            : <Route exact path="/" element={<LoginPage />} />}
+            : <>
+            <Route exact path="/login" element={<LoginPage />} />
+            <Route exact path="/" element={<LoginPage />} />
+            <Route path="*" element={<Navigate to="/403" replace />} />
+            </>}
         </Routes>
       </Router>
     </div>
