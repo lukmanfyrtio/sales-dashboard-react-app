@@ -5,6 +5,7 @@ import ForbiddenPage from './pages/ForbiddenPage';
 import AdminDashboard from './pages/AdminDashboard';
 import SuccessLogin from './pages/SuccessLogin.jsx';
 import { useAuthContext } from '@asgardeo/auth-react';
+import DetailDashboard from './pages/DetailDashboard.jsx';
 
 
 
@@ -24,6 +25,7 @@ function App() {
             <>
               <Route exact path="/" element={<AdminDashboard />} />
               <Route exact path="/dashboard" element={<AdminDashboard />} />
+              <Route exact path="/dashboard/detail" element={<DetailDashboard />} />
               <Route exact path="/login" element={<SuccessLogin />} />
             </>
             : <Route exact path="/" element={<LoginPage />} />}

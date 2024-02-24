@@ -334,9 +334,12 @@ export class AdminDashboard extends Component {
       .catch((err) => {
         console.error({ err });
       });
-      this.setState({
-        openLoad:false
-      })
+      setTimeout(() => {
+        // Set openLoad to false to hide the loader when the data is loaded
+        this.setState({
+          openLoad: false,
+        });
+      }, 2000); // You can adjust the delay as needed
   };
 
   componentDidMount() {
