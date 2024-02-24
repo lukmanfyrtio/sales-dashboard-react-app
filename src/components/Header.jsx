@@ -5,7 +5,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Logout from "@mui/icons-material/Logout";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import { Button } from "@mui/material";
+import { IconButton, Divider } from "@mui/material";
 import { useAuthContext } from "@asgardeo/auth-react";
 
 import home from "../assets/images/home.png";
@@ -37,17 +37,19 @@ function Header() {
     getAccessToken
   } = useAuthContext();
   useEffect(() => {
+    console.log(state);
     if (state?.isAuthenticated) {
       if (!photoUrl) {
         getBasicUserInfo().then((response) => {
           setPhotoUrl(response.picture)
+          console.log(response);
         }).catch((error) => {
           console.error(error);
         });
       }
 
     }
-  }, [state.isAuthenticated,getBasicUserInfo,photoUrl])
+  }, [state.isAuthenticated, getBasicUserInfo, photoUrl])
   useEffect(() => {
     //running the api call on first render/refresh
     startTime();
@@ -59,10 +61,10 @@ function Header() {
   }, []);
 
   useEffect(() => {
-   
+
     getAccessToken()
       .then((token) => {
-        console.log("getAccessToken loaded "+new Date().getHours()+":"+new Date().getMinutes());
+        console.log("getAccessToken loaded " + new Date().getHours() + ":" + new Date().getMinutes());
         localStorage.setItem("token", token);
       })
       .catch((error) => {
@@ -133,30 +135,25 @@ function Header() {
             <label className="tittle-header-dashboard">Sales Dashboard</label>
           </div>
           <div className="right-header-dash">
-            <div className="profile">
-              <img src={photoUrl ? photoUrl : profpic} alt="Avatar" />
-              <label className="profile-name">{state.displayName}</label>
+            <div>
               <div>
-                <Button
-                  id="basic-button"
+                <IconButton
                   aria-controls={openPopup ? "basic-menu" : undefined}
                   aria-haspopup="true"
                   aria-expanded={openPopup ? "true" : undefined}
                   onClick={handleClick}
-                  className="button-arrow"
+                  size="small"
+                  sx={{ ml: 2 }}
+                  className="profile"
                 >
-                  <span
-                    className={`material-icons-sharp ${openPopup ? "open" : ""
-                      }`}
-                  >
-                    expand_more
-                  </span>
-                </Button>
+                  <img src={photoUrl ? photoUrl : profpic} alt="Avatar" />
+                </IconButton>
                 <Menu
                   id="basic-menu"
                   anchorEl={anchorEl}
                   open={openPopup}
                   onClose={handleClose}
+                  onClick={handleClose}
                   MenuListProps={{
                     "aria-labelledby": "basic-button",
                   }}
@@ -169,6 +166,13 @@ function Header() {
                     horizontal: "center",
                   }}
                 >
+                  <MenuItem sx={[{ '&:hover': { backgroundColor: 'transparent' } }]} >
+                    <div className="profile-name">
+                      <label >{state.displayName}</label>
+                      <label className="profile-name-2" >{state.email}</label>
+                    </div>
+                  </MenuItem>
+                  <Divider />
                   <MenuItem
                     onClick={() => {
                       on("sign-out", () => {
@@ -181,7 +185,7 @@ function Header() {
                     <ListItemIcon>
                       <Logout fontSize="small" />
                     </ListItemIcon>
-                    Logout
+                    <label className="profile-name">Logout</label>
                   </MenuItem>
                 </Menu>
               </div>
@@ -214,7 +218,7 @@ function Header() {
                       : ""
                   }
                 >
-                  <img src={val.icon} alt=""/>
+                  <img src={val.icon} alt="" />
                   {val.label}
                 </li>
               );

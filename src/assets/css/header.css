@@ -54,8 +54,7 @@
   width: 46px;
   object-fit: cover;
   border-radius: 50%;
-  border: 1px solid #e5edff;
-  margin-right: 1rem;
+  border: 1px solid hwb(222 16% 40%);
 }
 
 .profile {
@@ -75,8 +74,23 @@
 .menu-btn {
   display: none;
 }
+
 .profile-name {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  color:#173370;
+  font-family: Poppins;
+  font-size: 13px;
+}
+
+.profile-name-2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  color:rgba(0, 0, 0, 0.54);
+  font-family: Poppins;
+  font-size: 11px;
 }
 
 .left-sidebar {
@@ -164,9 +178,6 @@
 
   .menu-btn {
     display: block;
-  }
-  .profile-name {
-    display: none;
   }
   .left-sidebar {
     width: 0;
