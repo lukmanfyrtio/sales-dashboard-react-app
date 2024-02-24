@@ -313,7 +313,7 @@ function SalesInfoAdd(props) {
                 </div>
 
                 <div className="input-i">
-                  <label>Nomer Invoice</label>
+                  <label>Invoice Number </label>
                   <input
                     onChange={(e) => setNoInvoice(e.target.value)}
                     value={noInvoice}
@@ -321,7 +321,7 @@ function SalesInfoAdd(props) {
                 </div>
 
                 <div className="input-i">
-                  <label>Tanggal Invoice</label>
+                  <label>Invoice Date</label>
                   <div>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                       <Stack>
@@ -348,7 +348,7 @@ function SalesInfoAdd(props) {
                 </div>
 
                 <div className="input-i">
-                  <label>Tanggal Invoice diterima Tenant</label>
+                  <label>Tenant's Invoice Received Date</label>
                   <div>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                       <Stack>
@@ -375,7 +375,7 @@ function SalesInfoAdd(props) {
                 </div>
 
                 <div className="input-i">
-                  <label>Tanggal Jatuh Tempo</label>
+                  <label>Due Date</label>
                   <div>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                       <Stack>
@@ -406,7 +406,7 @@ function SalesInfoAdd(props) {
               <div className="column-form">
 
                 <div className="input-i">
-                  <label>Pokok Penerimaan (Rp)</label>
+                  <label>Principal Receipt (Rp)</label>
                   <input
                     // type="number"
                     onChange={(e) => setPokokPenerimaan(e.target.value)}
@@ -415,7 +415,7 @@ function SalesInfoAdd(props) {
                 </div>
 
                 <div className="input-i">
-                  <label>Tgl masuk Rekening POKOK</label>
+                  <label>Principal Payment Date</label>
                   <div>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                       <Stack>
@@ -442,7 +442,7 @@ function SalesInfoAdd(props) {
                 </div>
 
                 <div className="input-i">
-                  <label>Keterangan</label>
+                  <label>Notes</label>
                   <div>
                     <TextareaAutosize
                       aria-label="minimum height"

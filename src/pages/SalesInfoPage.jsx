@@ -382,7 +382,7 @@ function SalesInfoPage() {
 
                     // Create the static string with the timestamp
                     const staticString = `Sales_${formattedTimestamp}`;
-                    link.setAttribute("download", staticString+".xlsx"); //any other extension
+                    link.setAttribute("download", staticString + ".xlsx"); //any other extension
 
                     document.body.appendChild(link);
 
@@ -442,22 +442,22 @@ function SalesInfoPage() {
                   <StyledTableCell>Company</StyledTableCell>
                   <StyledTableCell align="center">Tenant</StyledTableCell>
                   <StyledTableCell align="center">
-                    Nomer Invoice
+                    Invoice Number
                   </StyledTableCell>
-                  <StyledTableCell align="center">Tanggal Invoice</StyledTableCell>
+                  <StyledTableCell align="center">Invoice Date</StyledTableCell>
                   <StyledTableCell align="center">
-                    Tanggal Invoice diterima Tenant
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    Tanggal Jatuh Tempo
+                    Tenant's Invoice Received Date
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    Pokok Penerimaan (Rp)
+                    Due Date
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    Tgl masuk Rekening POKOK
+                    Principal Receipt (Rp)
                   </StyledTableCell>
-                  <StyledTableCell align="center">Keterangan</StyledTableCell>
+                  <StyledTableCell align="center">
+                    Principal Payment Date
+                  </StyledTableCell>
+                  <StyledTableCell align="center">Notes</StyledTableCell>
                   <StyledTableCell align="center">Action</StyledTableCell>
                 </TableRow>
               </TableHead>

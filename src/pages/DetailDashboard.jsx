@@ -483,11 +483,11 @@ function DetailDashboard(props) {
           <div className="row">
             <BarChart
               options={optionLeftChart.options}
-              tittle={`${tittle} - Target vs Actual (dalam miliar Rp.)`}
+              tittle={`${tittle} - Target vs Actual (in billion Rp.)`}
               data={dataTargetvsActual}
             />
             <BarChart
-              tittle={`${tittle} - Existing / Prospek / Gap (dalam miliar Rp.)`}
+              tittle={`${tittle} - Existing / Prospects / Gap (in billion Rp.)`}
               data={dataRight}
               options={optionRightChart.options}
             />

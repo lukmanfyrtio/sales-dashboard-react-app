@@ -33,7 +33,8 @@ function Header() {
 
   const {
     state,
-    getBasicUserInfo
+    getBasicUserInfo,
+    getAccessToken
   } = useAuthContext();
   useEffect(() => {
     if (state?.isAuthenticated) {
@@ -56,6 +57,18 @@ function Header() {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+   
+    getAccessToken()
+      .then((token) => {
+        console.log("getAccessToken loaded "+new Date().getHours()+":"+new Date().getMinutes());
+        localStorage.setItem("token", token);
+      })
+      .catch((error) => {
+        console.error("Unexpected error ex:", error);
+      });
+  }, [getAccessToken])
 
   function checkTime(i) {
     if (i < 10) {

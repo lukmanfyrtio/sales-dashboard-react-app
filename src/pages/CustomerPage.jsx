@@ -530,10 +530,10 @@ function CustomerPage() {
                 <TableRow>
                   <StyledTableCell></StyledTableCell>
                   <StyledTableCell>Company</StyledTableCell>
-                  <StyledTableCell>Bulan</StyledTableCell>
-                  <StyledTableCell align="center">Nama Sales</StyledTableCell>
+                  <StyledTableCell>Month</StyledTableCell>
+                  <StyledTableCell align="center">Sales Name</StyledTableCell>
                   <StyledTableCell align="center">
-                    Calon Pelanggan
+                    Potential Customer Name
                   </StyledTableCell>
                   <StyledTableCell align="center">Product</StyledTableCell>
                   <StyledTableCell align="center">
@@ -542,9 +542,9 @@ function CustomerPage() {
                   <StyledTableCell align="center">Aging</StyledTableCell>
                   <StyledTableCell align="center">Status</StyledTableCell>
                   <StyledTableCell align="center">
-                    Proyeksi Nilai
+                    Projected Value
                   </StyledTableCell>
-                  <StyledTableCell align="center">Keterangan</StyledTableCell>
+                  <StyledTableCell align="center">Notes</StyledTableCell>
                   <StyledTableCell align="center">Action</StyledTableCell>
                 </TableRow>
               </TableHead>

@@ -472,7 +472,7 @@ function CustomerAdd(props) {
               <div className="column-form">
                 {id ? (
                   <div className="input-i">
-                    <label>ID Pelanggan</label>
+                    <label>Customer ID</label>
                     <div>
                       <label>{id}</label>
                     </div>
@@ -482,7 +482,7 @@ function CustomerAdd(props) {
                 )}
 
                 <div className="input-i">
-                  <label>Bulan</label>
+                  <label>Month</label>
                   <div>
                     <FormControl sx={{ m: 0, width: 200, mt: 0 }}>
                       <Select
@@ -577,7 +577,7 @@ function CustomerAdd(props) {
                   </div>
                 </div>
                 <div className="input-i">
-                  <label>Nama Sales</label>
+                  <label>Sales Name</label>
                   <div className="input-i-txt">
                     <input
                       onChange={(e) => setNamaSales(e.target.value)}
@@ -597,7 +597,7 @@ function CustomerAdd(props) {
                   </div>
                 </div>
                 <div className="input-i">
-                  <label>Calon Pelanggan</label>
+                  <label>Potential Customer Name</label>
                   <div className="input-i-txt">
                     <input
                       onChange={(e) => setCalonPelanggan(e.target.value)}
@@ -619,14 +619,14 @@ function CustomerAdd(props) {
 
 
                 <div className="input-i">
-                  <label>Nomer Telepon</label>
+                  <label>Phone Number</label>
                   <input
                     onChange={(e) => setNomerTelepon(e.target.value)}
                     value={nomerTelepon}
                   ></input>
                 </div>
                 <div className="input-i">
-                  <label>Alamat Email</label>
+                  <label>Email Address</label>
                   <input
                     onChange={(e) => setEmail(e.target.value)}
                     value={email}
@@ -683,7 +683,7 @@ function CustomerAdd(props) {
                   </div>
                 </div>
                 <div className="input-i">
-                  <label>Produk</label>
+                  <label>Product</label>
                   <div className="input-i-txt">
                     <FormControl fullWidth>
                       <Select
@@ -733,7 +733,7 @@ function CustomerAdd(props) {
                   </div>
                 </div>
                 <div className="input-i">
-                  <label>Proyeksi Nilai</label>
+                  <label>Projected Value</label>
                   <div className="input-i-txt">
                     <input
                       onChange={(e) => setProyeksiNilai(e.target.value)}
@@ -1219,7 +1219,7 @@ function CustomerAdd(props) {
 
 
                 <div className="input-i">
-                  <label>Alamat</label>
+                  <label>Address</label>
                   <div>
                     <TextareaAutosize
                       aria-label="minimum height"
@@ -1231,35 +1231,35 @@ function CustomerAdd(props) {
                   </div>
                 </div>
                 <div className="input-i">
-                  <label>Kelurahan</label>
+                  <label>Villages</label>
                   <input
                     onChange={(e) => setKelurahan(e.target.value)}
                     value={kelurahan}
                   ></input>
                 </div>
                 <div className="input-i">
-                  <label>Kecamatan</label>
+                  <label>District</label>
                   <input
                     onChange={(e) => setKecamatan(e.target.value)}
                     value={kecamatan}
                   ></input>
                 </div>
                 <div className="input-i">
-                  <label>Kabupaten</label>
+                  <label>Regency</label>
                   <input
                     onChange={(e) => setKabupaten(e.target.value)}
                     value={kabupaten}
                   ></input>
                 </div>
                 <div className="input-i">
-                  <label>Provinsi</label>
+                  <label>Province</label>
                   <input
                     onChange={(e) => setProvinsi(e.target.value)}
                     value={provinsi}
                   ></input>
                 </div>
                 <div className="input-i">
-                  <label>Kode Pos</label>
+                  <label>Postal Code</label>
                   <input
                     onChange={(e) => setKodePos(e.target.value)}
                     value={kodePos}

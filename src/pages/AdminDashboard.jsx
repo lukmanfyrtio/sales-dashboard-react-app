@@ -651,7 +651,7 @@ export class AdminDashboard extends Component {
                 MenuProps={MenuProps}
                 inputProps={{ "aria-label": "Without label" }}
               >
-                <MenuItem key="1" value="" style={getStyles()}>
+                <MenuItem key="1" value="" style={getStyles()} disabled>
                   <em>Pilih Tahun</em>
                 </MenuItem>
                 {listYear.map((name) => (
@@ -722,7 +722,7 @@ export class AdminDashboard extends Component {
                     },
                   },
                 }}
-                tittle={`Target Cash-in vs Actual ${this.state.filterYear} (dalam miliar Rp.)`}
+                tittle={`Target Cash-in vs Actual ${this.state.filterYear} (in billion Rp.)`}
                 data={data}
               />
               <div className="margin-3-right">
@@ -779,19 +779,19 @@ export class AdminDashboard extends Component {
               <BarChart
                 options={optionHorizontal.options}
                 className="width-30"
-                tittle="SWADAMA - Pencapaian 3 Bulan Terakhir (dalam miliar Rp.)"
+                tittle="SWADAMA - Achievements of the Last 3 Months (in billion Rp.)"
                 data={this.state.dataChartSwadama}
               />
               <BarChart
                 options={optionHorizontal.options}
                 className="width-30"
-                tittle="MOTIO - Pencapaian 3 Bulan Terakhir (dalam miliar Rp.)"
+                tittle="MOTIO - Achievements of the Last 3 Months (in billion Rp.)"
                 data={this.state.dataChartMotio}
               />
               <BarChart
                 options={optionHorizontal.options}
                 className="width-30"
-                tittle="SWAMEDIA - Pencapaian 3 Bulan Terakhir (dalam miliar Rp.)"
+                tittle="SWAMEDIA - Achievements of the Last 3 Months (in billion Rp.)"
                 data={this.state.dataChartSwamedia}
               />
             </div>

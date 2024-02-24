@@ -208,7 +208,7 @@ function SalesTargetPage() {
               <TableHead>
                 <TableRow>
                   <StyledTableCell>BUP</StyledTableCell>
-                  <StyledTableCell align="center">Tahun</StyledTableCell>
+                  <StyledTableCell align="center">Year</StyledTableCell>
                   <StyledTableCell align="center">Target</StyledTableCell>
                   <StyledTableCell align="center">Existing</StyledTableCell>
                   <StyledTableCell align="center">Action</StyledTableCell>

@@ -414,7 +414,7 @@ function SalesTargetAdd() {
               </div>
               <div className="column-form-tittle">
                 <div className="input-i-tittle">
-                  <label>Target (dalam miliar Rp.)</label>
+                  <label>Target (in billion Rp.)</label>
                 </div>
               </div>
               <div className="column-form">
@@ -519,7 +519,7 @@ function SalesTargetAdd() {
             <div className="row-right">
               <div className="column-form">
                 <div className="input-i">
-                  <label>Tahun</label>
+                  <label>Year</label>
                   <div>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                       <Stack>
@@ -548,7 +548,7 @@ function SalesTargetAdd() {
               </div>
               <div className="column-form-tittle">
                 <div className="input-i-tittle">
-                  <label>Existing (dalam miliar Rp.)</label>
+                  <label>Existing (in billion Rp.)</label>
                 </div>
               </div>
               <div className="column-form">
