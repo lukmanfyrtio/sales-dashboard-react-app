@@ -9,6 +9,8 @@ import DetailDashboard from './pages/DetailDashboard.jsx';
 import CustomerPage from './pages/CustomerPage.jsx';
 import CustomerAdd from './pages/CustomerAdd.jsx';
 import CustomerUpload from './pages/CustomerUpload.jsx';
+import SalesInfoPage from './pages/SalesInfoPage.jsx';
+import SalesInfoAdd from './pages/SalesInfoAdd.jsx';
 
 
 
@@ -34,6 +36,10 @@ function App() {
               <Route exact path="/customer/add" element={<CustomerAdd />} />
               <Route exact path="/customer/edit" element={<CustomerAdd />} />
               <Route exact path="/customer/upload" element={<CustomerUpload />} />
+
+              <Route exact path="/sales" element={<SalesInfoPage />} />
+              <Route exact path="/sales/add" element={<SalesInfoAdd />} />
+              <Route exact path="/sales/edit" element={<SalesInfoAdd />} />
 
               <Route exact path="/login" element={<SuccessLogin />} />
             </>
