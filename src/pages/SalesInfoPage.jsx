@@ -327,7 +327,7 @@ function SalesInfoPage() {
             ) : (
               ""
             )}
-            <div className="search-bar">
+            <div className="search-bar  input-style">
               <input
                 type="search"
                 placeholder="Search"
