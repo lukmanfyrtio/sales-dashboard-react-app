@@ -440,13 +440,13 @@ function SalesInfoPage() {
               <TableHead>
                 <TableRow>
                   <StyledTableCell>Company</StyledTableCell>
-                  <StyledTableCell align="center">Tenant</StyledTableCell>
+                  <StyledTableCell align="center">Customer</StyledTableCell>
                   <StyledTableCell align="center">
                     Invoice Number
                   </StyledTableCell>
                   <StyledTableCell align="center">Invoice Date</StyledTableCell>
                   <StyledTableCell align="center">
-                    Tenant's Invoice Received Date
+                  Customer's Invoice Received Date
                   </StyledTableCell>
                   <StyledTableCell align="center">
                     Due Date

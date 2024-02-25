@@ -87,6 +87,7 @@ function SalesInfoAdd(props) {
 
   
   const [id, setId] = React.useState();
+  const [customers, setCustomers] = React.useState([]);
   const [BUP, setBup] = React.useState("");
   const [tglMasukRekeningPokok, setTglMasukRekeningPokok] = React.useState(null);
   const [tglInvoiceDiterimaTenant, setTglInvoiceDiterimaTenant] = React.useState(null);
@@ -99,6 +100,18 @@ function SalesInfoAdd(props) {
 
   const { state } = useLocation();
   useEffect(() => {
+    axios.get(apis.server + "/dashboard/customers", {
+      headers: {
+        Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+          }`,
+      },
+    })
+    .then((res) => {
+      setCustomers(res.data.data);
+    })
+    .catch((err) => {
+      console.error({ err });
+    });
     if (state?.sales) {
       const sales = state.sales;
       setIsEdit(true);
@@ -305,11 +318,39 @@ function SalesInfoAdd(props) {
                 </div>
 
                 <div className="input-i">
-                  <label>Tenant</label>
-                  <input
-                    onChange={(e) => setTenant(e.target.value)}
-                    value={tenant}
-                  ></input>
+                  <label>Customer</label>
+                  <div>
+                    <FormControl sx={{ m: 0, width: 200, mt: 0 }}>
+                      <Select
+                        id="Tenant"
+                        className="input-style"
+                        size="small"
+                        displayEmpty
+                        value={tenant}
+                        onChange={(e) => setTenant(e.target.value)}
+                        input={<OutlinedInput />}
+                        renderValue={(selected) => {
+                          if (selected) {
+                            return (
+                              <label style={getStyles()}>{selected}</label>
+                            );
+                          }
+                          return <em style={getStyles()}>Pilih</em>;
+                        }}
+                        MenuProps={MenuProps}
+                        inputProps={{ "aria-label": "Without label" }}
+                      >
+                        <MenuItem key="BUP" value="BUP" style={getStyles()}>
+                          <em>Pilih Customer</em>
+                        </MenuItem>
+                        {customers.map((name) => (
+                          <MenuItem key={name} value={name} style={getStyles()}>
+                            {name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </div>
                 </div>
 
                 <div className="input-i">
@@ -348,7 +389,7 @@ function SalesInfoAdd(props) {
                 </div>
 
                 <div className="input-i">
-                  <label>Tenant's Invoice Received Date</label>
+                  <label>Customer's Invoice Received Date</label>
                   <div>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                       <Stack>
