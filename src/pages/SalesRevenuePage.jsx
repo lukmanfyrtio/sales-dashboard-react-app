@@ -22,14 +22,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import Stack from "@mui/material/Stack";
 import apis from "../apis.js";
-import { Backdrop, CircularProgress } from "@mui/material";
-
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-
-
 const style = {
   position: "absolute",
   top: "50%",
@@ -46,23 +44,7 @@ const style = {
   fontFamily: "Poppins",
 };
 
-function getStylesM() {
-  return {
-    fontSize: "0.9rem",
-    color: "grey",
-    fontFamily: "Poppins",
-  };
-}
-
-function getStylesH() {
-  return {
-    fontSize: "1.2rem",
-    color: "grey",
-    fontFamily: "Poppins",
-  };
-}
-
-function CustomerPage() {
+function SalesRevenuePage() {
   const navigate = useNavigate();
   const ITEM_HEIGHT = 30;
   const ITEM_PADDING_TOP = 8;
@@ -74,68 +56,27 @@ function CustomerPage() {
     },
   };
 
-  const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: "#E5EDFF",
-      color: "#8697B6",
-      fontWeight: "bold",
-      fontFamily: "Poppins",
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: "small",
-      fontFamily: "Poppins",
-    },
-  }));
-
-  const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    // hide last border
-    "&:last-child td, &:last-child th": {
-      border: 0,
-    },
-  }));
-
-  function getStyles() {
-    return {
-      fontSize: "0.7rem",
-      color: "grey",
-      fontFamily: "Poppins",
-    };
-  }
-
-  const statusList = ["Open", "Close"];
-  const currentStageList = [
-    "Opportunities",
-    "Proposal",
-    "Negotiation",
-    "Deals",
-    "Dropped",
-  ];
+  const [departmentLists, setDepartmentLists] = React.useState([]);
+  const [list, setList] = React.useState([]);
 
   const [departmentId, setDepartmentId] = React.useState("");
-
-  const [departmentLists, setDepartmentLists] = React.useState([]);
-  const [Stage, setStage] = React.useState("");
-  const [Status, setStatus] = React.useState("");
   const [Search, setSearch] = React.useState("");
+  const [deletedID, setDeletedID] = React.useState(null);
 
-  const [list, setList] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [totalElements, setTotalElements] = React.useState(0);
+  const [openLoad, setOpenLoad] = React.useState(false);
 
   const [create, setCreate] = React.useState(1);
   const [update, setUpdate] = React.useState(1);
   const [deletePr, setDeletePr] = React.useState(1);
-  const [deletedID, setDeletedID] = React.useState(null);
 
-
-  const [openLoad, setOpenLoad] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [modalTittle, setModalTittle] = React.useState("Information");
   const [modalMessage, setModalMessage] = React.useState(
     "Data berhasil disimpan"
   );
-
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -146,13 +87,73 @@ function CustomerPage() {
     setPage(0);
   };
 
+  function getStyles() {
+    return {
+      fontSize: "0.7rem",
+      color: "grey",
+      fontFamily: "Poppins",
+    };
+  }
+
+  function getStylesM() {
+    return {
+      fontSize: "0.9rem",
+      color: "grey",
+      fontFamily: "Poppins",
+    };
+  }
+
+  function getStylesH() {
+    return {
+      fontSize: "1.2rem",
+      color: "grey",
+      fontFamily: "Poppins",
+    };
+  }
+
+  const handleDelete = (id) => {
+    setOpenLoad(false);
+    setOpen(true);
+    axios
+      .delete(apis.server + `/sales-revenue/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
+        },
+      })
+      .then((res) => {
+        if(res.status===204){
+          getList();
+          setOpenLoad(false);
+          setOpen(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const fetchUnitData = () => {
+    axios
+      .get(apis.server + `/departments`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
+        },
+      })
+      .then((res) => {
+        setDepartmentLists(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   const getList = () => {
     axios
-      .get(apis.server + "/salesleads/filter", {
+      .get(apis.server + "/sales-revenue/filter", {
         params: {
           departmentId: departmentId ? departmentId : null,
-          stage: Stage ? Stage : null,
-          status: Status ? Status : null,
           search: Search ? Search : null,
           page: page,
           size: rowsPerPage,
@@ -171,28 +172,29 @@ function CustomerPage() {
       });
   };
 
-  const handleDelete = (id) => {
-    setOpen(false)
-    setOpenLoad(true);
-    axios
-      .delete(apis.server + `/salesleads/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
-            }`,
-        },
-      })
-      .then((res) => {
-        if (res.status === 204) {
-          getList();
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    setOpenLoad(false);
-    setOpen(false)
-  };
+  const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+      backgroundColor: "#E5EDFF",
+      color: "#8697B6",
+      fontWeight: "bold",
+      fontFamily: "Poppins",
+    },
+    [`&.${tableCellClasses.body}`]: {
+      fontSize: "small",
+      fontFamily: "Poppins",
+    },
+  }));
 
+  const StyledTableRow = styled(TableRow)(({ theme }) => ({
+
+    // hide last border
+    "&:last-child td, &:last-child th": {
+      border: 0,
+    },
+  }));
+
+
+  /* Fungsi */
   function formatRupiah(angka, prefix) {
     var number_string = angka.replace(/[^,\d]/g, "").toString();
     var split = number_string.split(",");
@@ -209,91 +211,71 @@ function CustomerPage() {
     return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
   }
 
-  const fetchUnitData = () => {
-    axios
-      .get(apis.server + `/departments`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
-            }`,
-        },
-      })
-      .then((res) => {
-        setDepartmentLists(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
 
   useEffect(() => {
     setOpenLoad(true)
     getList();
     fetchUnitData();
     setOpenLoad(false)
-  }, [departmentId, Stage, Status, Search, page, rowsPerPage]);
+  }, [departmentId, Search, page, rowsPerPage]);
 
   return (
     <div>
-      <Modal
-        open={open}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography
-            style={getStylesH()}
-            id="modal-modal-title"
-            variant="h6"
-            component="h2"
-          >
-            {modalTittle}
-          </Typography>
-          <Typography
-            id="modal-modal-description"
-            sx={{ mt: 2, mb: 4 }}
-            style={getStylesM()}
-          >
-            {modalMessage}
-          </Typography>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "flex-end",
-              width: "100%",
-              justifyContent: "flex-end",
-            }}
-          >
-            <div
-              className="btn-half"
-              onClick={() => {
-                if (modalTittle === "Warning - Delete") {
-                  if (deletePr == 1) {
-                    handleDelete(deletedID);
-                  } else {
-                    navigate("/403");
-                  }
-                }
-              }}
-            >
-              OK
-            </div>
-
-            <div
-              className="btn-half-cancel"
-              onClick={() => {
-                setOpen(false);
-                setOpenLoad(false);
-              }}
-            >
-              Cancel
-            </div>
-          </div>
-        </Box>
-      </Modal>
       <Header />
       <div className="right-content">
-        <div className="tittle-content">Prospect/Leads</div>
+        <div className="tittle-content">Invoice & Cash-In</div>
+        <Modal
+          open={open}
+          // onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Typography
+              style={getStylesH()}
+              id="modal-modal-title"
+              variant="h6"
+              component="h2"
+            >
+              {modalTittle}
+            </Typography>
+            <Typography
+              id="modal-modal-description"
+              sx={{ mt: 2, mb: 4 }}
+              style={getStylesM()}
+            >
+              {modalMessage}
+            </Typography>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "flex-end",
+                width: "100%",
+                justifyContent: "flex-end",
+              }}
+            >
+              <div
+                className="btn-half"
+                onClick={() => {
+                    handleDelete(deletedID);
+                    setOpenLoad(false);
+                }}
+              >
+                OK
+              </div>
+
+              <div
+                className="btn-half-cancel"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Cancel
+              </div>
+            </div>
+          </Box>
+        </Modal>
         <div className="row center-row">
           <div className="filter-row">
             <Backdrop
@@ -334,67 +316,7 @@ function CustomerPage() {
             ) : (
               ""
             )}
-
-            {/* current stage filter */}
-            <FormControl sx={{ m: 0, width: 200, mt: 0 }}>
-              <Select
-                id="Stage"
-                className="input-style"
-                size="small"
-                displayEmpty
-                value={Stage}
-                onChange={(e) => setStage(e.target.value)}
-                input={<OutlinedInput />}
-                renderValue={(selected) => {
-                  if (selected) {
-                    return <label style={getStyles()}>{selected}</label>;
-                  }
-                  return <em style={getStyles()}>Current Stage</em>;
-                }}
-                MenuProps={MenuProps}
-                inputProps={{ "aria-label": "Without label" }}
-              >
-                <MenuItem key="2" value="" style={getStyles()}>
-                  <em>Pilih Current Stage</em>
-                </MenuItem>
-                {currentStageList.map((name) => (
-                  <MenuItem key={name} value={name} style={getStyles()}>
-                    {name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            {/* status filter */}
-            <FormControl sx={{ m: 0, width: 200, mt: 0 }}>
-              <Select
-                id="status"
-                className="input-style"
-                size="small"
-                displayEmpty
-                value={Status}
-                onChange={(e) => setStatus(e.target.value)}
-                input={<OutlinedInput />}
-                renderValue={(selected) => {
-                  if (selected) {
-                    return <label style={getStyles()}>{selected}</label>;
-                  }
-                  return <em style={getStyles()}>Status</em>;
-                }}
-                MenuProps={MenuProps}
-                inputProps={{ "aria-label": "Without label" }}
-              >
-                <MenuItem key="3" value="" style={getStyles()}>
-                  <em>Pilih Status</em>
-                </MenuItem>
-                {statusList.map((name) => (
-                  <MenuItem key={name} value={name} style={getStyles()}>
-                    {name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <div className="search-bar input-style">
+            <div className="search-bar  input-style">
               <input
                 type="search"
                 placeholder="Search"
@@ -407,21 +329,11 @@ function CustomerPage() {
           <div className="add-btn-row">
             <div
               className="button-c"
-              onClick={() => navigate("/customer/upload")}
-            >
-              <div className="btn-padding">
-                <span className="material-icons-sharp">add</span>
-              </div>
-              <label style={{ color: "#718292" }}>Upload Data</label>
-            </div>
-
-            <div
-              className="button-c"
               onClick={() => {
                 setOpenLoad(true);
                 const method = "GET";
 
-                const url = apis.server + "/dashboard/download";
+                const url = apis.server + "/invoice/download";
 
                 axios
 
@@ -445,10 +357,8 @@ function CustomerPage() {
                     const link = document.createElement("a");
 
                     link.href = downloadUrl;
-
                     const currentDate = new Date();
 
-                    // Get individual components of the date and time
                     const year = currentDate.getFullYear();
                     const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based
                     const day = String(currentDate.getDate()).padStart(2, '0');
@@ -460,7 +370,7 @@ function CustomerPage() {
                     const formattedTimestamp = `${year}${month}${day}${hours}${minutes}${seconds}`;
 
                     // Create the static string with the timestamp
-                    const staticString = `Customer_${formattedTimestamp}`;
+                    const staticString = `Sales_${formattedTimestamp}`;
                     link.setAttribute("download", staticString + ".xlsx"); //any other extension
 
                     document.body.appendChild(link);
@@ -481,7 +391,7 @@ function CustomerPage() {
               className="button-c"
               onClick={() => {
                 if (create == 1) {
-                  navigate("/customer/add");
+                  navigate("/sales/add");
                 } else {
                   navigate("/403");
                 }
@@ -499,22 +409,23 @@ function CustomerPage() {
             <Table sx={{ minWidth: 700 }} aria-label="customized table">
               <TableHead>
                 <TableRow>
-                  <StyledTableCell></StyledTableCell>
                   <StyledTableCell>Company</StyledTableCell>
-                  <StyledTableCell>Month</StyledTableCell>
-                  <StyledTableCell align="center">Sales Name</StyledTableCell>
+                  <StyledTableCell align="center">Customer</StyledTableCell>
                   <StyledTableCell align="center">
-                    Potential Customer Name
+                    Invoice Number
                   </StyledTableCell>
-                  <StyledTableCell align="center">Product</StyledTableCell>
-                  <StyledTableCell align="center">Unit/Department</StyledTableCell>
+                  <StyledTableCell align="center">Invoice Date</StyledTableCell>
                   <StyledTableCell align="center">
-                    Current Stage
+                    Unit/Department
                   </StyledTableCell>
-                  <StyledTableCell align="center">Aging</StyledTableCell>
-                  <StyledTableCell align="center">Status</StyledTableCell>
                   <StyledTableCell align="center">
-                    Projected Value
+                    Due Date
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    Principal Receipt (Rp)
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    Principal Payment Date
                   </StyledTableCell>
                   <StyledTableCell align="center">Notes</StyledTableCell>
                   <StyledTableCell align="center">Action</StyledTableCell>
@@ -532,85 +443,39 @@ function CustomerPage() {
                 )}
 
                 {list.map((row) => (
-                  <StyledTableRow key={row.idPelanggan}>
+                  <StyledTableRow key={row.id}>
                     <StyledTableCell component="th" scope="row">
-                      <span
-                        cl="dot"
-                        style={{
-                          backgroundColor: `${row.currentStage == "Opportunities"
-                            ? row.countDays > 10
-                              ? "red"
-                              : row.countDays > 8
-                                ? "yellow"
-                                : "green"
-                            : row.currentStage == "Proposal"
-                              ? row.countDays > 20
-                                ? "red"
-                                : row.countDays > 18
-                                  ? "yellow"
-                                  : "green"
-                              : row.currentStage == "Proposal"
-                                ? row.countDays > 20
-                                  ? "red"
-                                  : row.countDays > 18
-                                    ? "yellow"
-                                    : "green"
-                                : row.currentStage == "Negotiation"
-                                  ? row.countDays > 40
-                                    ? "red"
-                                    : row.countDays > 40 - 2
-                                      ? "yellow"
-                                      : "green"
-                                  : row.currentStage == "Deals"
-                                    ? row.countDays > 20
-                                      ? "red"
-                                      : row.countDays > 20 - 2
-                                        ? "yellow"
-                                        : "green"
-                                    : row.currentStage == "Dropped"
-                                      ? row.countDays > 20
-                                        ? "red"
-                                        : row.countDays > 20 - 2
-                                          ? "yellow"
-                                          : "green" : ""
-                            }`,
-                        }}
-                      ></span>
-                    </StyledTableCell>
-                    <StyledTableCell component="th" scope="row">
-                      {row.product.department.company.name ? row.product.department.company.name : "-"}
-                    </StyledTableCell>
-                    <StyledTableCell component="th" scope="row">
-                      {row.month ? row.month : "-"}
+                      {row.department.company.name ? row.department.company.name : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.salesName ? row.salesName : "-"}
+                      {row.salesLeads.potentialCustomer ? row.salesLeads.potentialCustomer : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.potentialCustomer ? row.potentialCustomer : "-"}
+                      {row.invoiceNumber ? row.invoiceNumber : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.product.name ? row.product.name : "-"}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row.product.department.name ? row.product.department.name : "-"}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row.currentStage ? row.currentStage : "-"}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row.countDays}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row.leadsStatus ? row.leadsStatus : "-"}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row.projectedValue
-                        ? formatRupiah(row.projectedValue, "RP .")
+                      {row.invoiceDate
+                        ? row.invoiceDate
                         : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.notes ? row.notes : "-"}
+                      {row.department.name ? row.department.name : "-"}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      {row.tglJatuhTempo ? row.tglJatuhTempo : "-"}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      {row.principalReceipt
+                        ? formatRupiah(row.principalReceipt, "RP .")
+                        : "-"}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      {row.principalReceiptEntryDate
+                        ? row.principalReceiptEntryDate
+                        : "-"}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      {row.description ? row.description : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
                       <Stack direction="row" spacing={1}>
@@ -637,9 +502,9 @@ function CustomerPage() {
                           color="primary"
                           onClick={(_) => {
                             if (update == 1) {
-                              navigate("/customer/edit", {
+                              navigate("/sales/edit", {
                                 state: {
-                                  customer: row,
+                                  sales: row,
                                 },
                               });
                             } else {
@@ -672,4 +537,4 @@ function CustomerPage() {
   );
 }
 
-export default CustomerPage;
+export default SalesRevenuePage;

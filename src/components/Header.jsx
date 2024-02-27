@@ -23,12 +23,16 @@ function Header() {
   const routes = useLocation();
   const [clock, setClock] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
+  const [open, setOpen] = useState(false);
+  const { signOut, on } = useAuthContext();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const openPopup = Boolean(anchorEl);
 
   const [menus, setMenus] = useState([
     { label: "Dashboard", icon: home, link: "/dashboard" },
-    { label: "Customer", icon: prospek, link: "/customer" },
-    { label: "Sales", icon: invoice, link: "/sales" },
-    { label: "Target & Existing", icon: target, link: "/sales-target" }
+    { label: "Leads", icon: prospek, link: "/sales-lead" },
+    { label: "Revenue", icon: invoice, link: "/sales-revenue" },
+    { label: "Target & Existing", icon: target, link: "/company-target" }
   ]);
 
   const {
@@ -36,40 +40,6 @@ function Header() {
     getBasicUserInfo,
     getAccessToken
   } = useAuthContext();
-  useEffect(() => {
-    if (state?.isAuthenticated) {
-      if (!photoUrl) {
-        getBasicUserInfo().then((response) => {
-          setPhotoUrl(response.picture)
-        }).catch((error) => {
-          console.error(error);
-        });
-      }
-
-    }
-  }, [state.isAuthenticated, getBasicUserInfo, photoUrl])
-  useEffect(() => {
-    //running the api call on first render/refresh
-    startTime();
-    //running the api call every one minute
-    const interval = setInterval(() => {
-      startTime();
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-
-    getAccessToken()
-      .then((token) => {
-        console.log(token);
-        // console.log("getAccessToken loaded " + new Date().getHours() + ":" + new Date().getMinutes());
-        localStorage.setItem("token", token);
-      })
-      .catch((error) => {
-        console.error("Unexpected error ex:", error);
-      });
-  }, [getAccessToken])
 
   function checkTime(i) {
     if (i < 10) {
@@ -106,20 +76,47 @@ function Header() {
     );
   }
 
-  const [open, setOpen] = useState(false);
-
-  const { signOut, on } = useAuthContext();
-
-
-
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const openPopup = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    if (state?.isAuthenticated) {
+      if (!photoUrl) {
+        getBasicUserInfo().then((response) => {
+          setPhotoUrl(response.picture)
+        }).catch((error) => {
+          console.error(error);
+        });
+      }
+
+    }
+  }, [state.isAuthenticated, getBasicUserInfo, photoUrl])
+
+
+  useEffect(() => {
+    //running the api call on first render/refresh
+    startTime();
+    //running the api call every one minute
+    const interval = setInterval(() => {
+      startTime();
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    getAccessToken()
+      .then((token) => {
+        console.log(token);
+        localStorage.setItem("token", token);
+      })
+      .catch((error) => {
+        console.error("Unexpected error ex:", error);
+      });
+  }, [getAccessToken])
   return (
     <div id="header">
       <nav>

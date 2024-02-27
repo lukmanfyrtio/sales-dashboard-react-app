@@ -23,7 +23,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import Stack from "@mui/material/Stack";
 import apis from "../apis.js";
 
-function SalesTargetPage() {
+function CompanyTargetPage() {
   const navigate = useNavigate();
   const ITEM_HEIGHT = 30;
   const ITEM_PADDING_TOP = 8;
@@ -304,4 +304,4 @@ function SalesTargetPage() {
   );
 }
 
-export default SalesTargetPage;
+export default CompanyTargetPage;
