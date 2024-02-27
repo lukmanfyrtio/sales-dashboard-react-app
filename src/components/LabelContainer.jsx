@@ -6,15 +6,15 @@ import apis from "../apis.js"
 
 function LabelContainer(props) {
   const navigate = useNavigate();
-  const { tittle, boxColor,year } = props;
+  const { tittle, boxColor,id,year } = props;
   const [labelDashboard, setLabelDashboard] = React.useState({});
   useEffect(() => {
 
     axios
     .get(apis.server+"/dashboard/target-breakdown", {
       params: {
-        bup: tittle?tittle:null,
-        tahun: year
+        departementUUID: id?id:null,
+        year: year
       },
       headers: {
         "Authorization" : `Bearer ${localStorage.token?localStorage.token:""}`
@@ -44,7 +44,8 @@ function LabelContainer(props) {
           navigate("/dashboard/detail", {
             state: {
               tittle,
-              year:year
+              year:year,
+              id:id
             },
           });
         }else{

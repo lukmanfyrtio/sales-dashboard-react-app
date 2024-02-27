@@ -164,7 +164,7 @@ function DetailDashboard(props) {
     },
   };
   const { state } = useLocation();
-  const { tittle, year } = state;
+  const { tittle, year ,id} = state;
 
   const [labelDashboard, setLabelDashboard] = React.useState({});
 
@@ -181,7 +181,7 @@ function DetailDashboard(props) {
     axios
       .get(apis.server + "/dashboard/list-sales", {
         params: {
-          bup: tittle ? tittle : null,
+          departementUUID: id ? id : null,
           tahun: year,
           page: page,
           size: 4,
@@ -204,8 +204,8 @@ function DetailDashboard(props) {
     axios
       .get(apis.server + "/dashboard/target-breakdown", {
         params: {
-          bup: tittle ? tittle : null,
-          tahun: year,
+          departementUUID: id ? id : null,
+          year: year,
         },
         headers: {
           Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
@@ -222,7 +222,7 @@ function DetailDashboard(props) {
     axios
       .get(apis.server + "/dashboard/avg-sales", {
         params: {
-          bup: tittle ? tittle : null,
+          departementUUID: id ? id : null,
           tahun: year,
         },
         headers: {
@@ -243,7 +243,7 @@ function DetailDashboard(props) {
     axios
       .get(apis.server + "/dashboard/target-actual", {
         params: {
-          bup: tittle ? tittle : null,
+          departementUUID: id ? id : null,
           tahun: year,
         },
         headers: {
@@ -287,7 +287,7 @@ function DetailDashboard(props) {
     axios
       .get(apis.server + "/dashboard/detail", {
         params: {
-          bup: tittle ? tittle : null,
+          departementUUID: id ? id : null,
           tahun: year
         },
         headers: {
@@ -306,7 +306,7 @@ function DetailDashboard(props) {
     axios
       .get(apis.server + "/dashboard/existing-gap", {
         params: {
-          bup: tittle ? tittle : null,
+          departementUUID: id ? id : null,
           tahun: year,
         },
         headers: {
@@ -428,7 +428,7 @@ function DetailDashboard(props) {
               />}
 
               <div className="logo-funnel" >
-                <img
+                {/* <img
                   style={{ background: tittle == "MOTIO" ? "#61CE70" : "", padding: tittle == "MOTIO" ? "4px" : "", borderRadius: tittle == "MOTIO" ? "3px" : "" }}
                   src={
                     tittle == "SWAMEDIA"
@@ -437,7 +437,7 @@ function DetailDashboard(props) {
                         ? MotioLogo
                         : SwadamaLogo
                   }
-                ></img>
+                ></img> */}
               </div>
               <div className="circle-funnel-box">
                 <div className="circle-funnel">

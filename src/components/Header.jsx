@@ -37,12 +37,10 @@ function Header() {
     getAccessToken
   } = useAuthContext();
   useEffect(() => {
-    console.log(state);
     if (state?.isAuthenticated) {
       if (!photoUrl) {
         getBasicUserInfo().then((response) => {
           setPhotoUrl(response.picture)
-          console.log(response);
         }).catch((error) => {
           console.error(error);
         });
@@ -64,7 +62,8 @@ function Header() {
 
     getAccessToken()
       .then((token) => {
-        console.log("getAccessToken loaded " + new Date().getHours() + ":" + new Date().getMinutes());
+        console.log(token);
+        // console.log("getAccessToken loaded " + new Date().getHours() + ":" + new Date().getMinutes());
         localStorage.setItem("token", token);
       })
       .catch((error) => {

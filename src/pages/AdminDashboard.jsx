@@ -15,20 +15,6 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 export class AdminDashboard extends Component {
   constructor(props) {
-    var months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
 
     super(props);
     // Don't call this.setState() here!
@@ -41,79 +27,14 @@ export class AdminDashboard extends Component {
         opportunities: 0,
         proposal: 0,
       },
-      openLoad:true,
-      resultDataTargetMotio: [],
-      resultDataTargetSwamedia: [],
-      resultDataTargetSwadama: [],
-      resultDataActualMotio: [],
-      resultDataActualSwamedia: [],
-      resultDataActualSwadama: [],
-      dataChartMotio: {
-        labels: [months[1], months[2], months[3]],
-        datasets: [
-          {
-            label: "Target",
-            data: [0, 0, 0, 0, 0, 0, 0],
-            backgroundColor: "#3b71ca",
-            borderColor: "#3b71ca",
-            borderWidth: 1,
-          },
-          {
-            label: "Actual",
-            data: [0, 0, 0, 0, 0, 0, 0],
-            backgroundColor: "#00b541",
-            borderColor: "#00b541",
-            borderWidth: 1,
-          },
-        ],
-      },
+      openLoad: true,
       filterYear: new Date().getFullYear(),
-      dataChartSwadama: {
-        labels: [months[1], months[2], months[3]],
-        datasets: [
-          {
-            label: "Target",
-            data: [0, 0, 0, 0, 0, 0, 0],
-            backgroundColor: "#3b71ca",
-            borderColor: "#3b71ca",
-            borderWidth: 1,
-          },
-          {
-            label: "Actual",
-            data: [0, 0, 0, 0, 0, 0, 0],
-            backgroundColor: "#00b541",
-            borderColor: "#00b541",
-            borderWidth: 1,
-          },
-        ],
-      },
-      dataChartSwamedia: {
-        labels: [months[1], months[2], months[3]],
-        datasets: [
-          {
-            label: "Target",
-            data: [0, 0, 0, 0, 0, 0, 0],
-            backgroundColor: "#3b71ca",
-            borderColor: "#3b71ca",
-            borderWidth: 1,
-          },
-          {
-            label: "Actual",
-            data: [0, 0, 0, 0, 0, 0, 0],
-            backgroundColor: "#00b541",
-            borderColor: "#00b541",
-            borderWidth: 1,
-          },
-        ],
-      },
+      dataDepartements: [],
+      departements: [],
     };
   }
 
-
-  getList = (year) => {
-    this.setState({
-      openLoad:true
-    })
+  fetchDataForDepartment = async (year) => {
     var months = [
       "January",
       "February",
@@ -128,78 +49,111 @@ export class AdminDashboard extends Component {
       "November",
       "December",
     ];
-    axios
-      .get(apis.server + "/dashboard/target-actual", {
+
+    var dataDepartementsTemp = [];
+    await axios
+      .get(apis.server + "/departments/display/top3", {
         params: {
-          bup: "SWADAMA",
           tahun: year,
         },
         headers: {
-          Authorization: `Bearer ${
-            localStorage.token ? localStorage.token : ""
-          }`,
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
         },
       })
       .then((res) => {
-        var resultActual = res.data.data.actual.map(function (x) {
-          return Number(x);
-        });
-
-        var resultTarget = res.data.data.target.map(function (x) {
-          return Number(x);
-        });
-
-        const d = new Date();
-        let monthN = d.getMonth();
         this.setState({
-          resultDataActualSwadama: resultActual,
-          resultDataTargetSwadama: resultTarget,
-          dataChartSwadama: {
-            labels: [
-              months[Number(monthN)],
-              months[Number(monthN - 1)],
-              months[Number(monthN - 2)],
-            ],
-            datasets: [
-              {
-                label: "Target",
-                data: [
-                  resultTarget[Number(monthN)],
-                  resultTarget[Number(monthN - 1)],
-                  resultTarget[Number(monthN - 2)],
-                ],
-                backgroundColor: "#3b71ca",
-                borderColor: "#3b71ca",
-                borderWidth: 1,
+          departements: res.data
+        })
+
+        res.data.forEach((dataDepartement, index) => {
+          var departmentUUID = dataDepartement.id;
+          var departmentName = dataDepartement.name;
+
+          try {
+            axios.get(apis.server + "/dashboard/target-actual", {
+              params: {
+                departementUUID: departmentUUID,
+                tahun: year,
               },
-              {
-                label: "Actual",
-                data: [
-                  resultActual[Number(monthN)],
-                  resultActual[Number(monthN - 1)],
-                  resultActual[Number(monthN - 2)],
-                ],
-                backgroundColor: "#00b541",
-                borderColor: "#00b541",
-                borderWidth: 1,
+              headers: {
+                Authorization: `Bearer ${localStorage.token ? localStorage.token : ""}`,
               },
-            ],
-          },
+            }).then((res) => {
+              const resultActual = res.data.data.actual.map(x => Number(x));
+              const resultTarget = res.data.data.target.map(x => Number(x));
+              const d = new Date();
+              const monthN = d.getMonth();
+              var dataDepartement =
+              {
+                id: departmentUUID,
+                name: departmentName,
+                resultDataActual: resultActual,
+                resultDataTarget: resultTarget,
+                dataChart: {
+                  labels: [
+                    months[Number(monthN)],
+                    months[Number(monthN - 1)],
+                    months[Number(monthN - 2)],
+                  ],
+                  datasets: [
+                    {
+                      label: "Target",
+                      data: [
+                        resultTarget[Number(monthN)],
+                        resultTarget[Number(monthN - 1)],
+                        resultTarget[Number(monthN - 2)],
+                      ],
+                      backgroundColor: "#3b71ca",
+                      borderColor: "#3b71ca",
+                      borderWidth: 1,
+                    },
+                    {
+                      label: "Actual",
+                      data: [
+                        resultActual[Number(monthN)],
+                        resultActual[Number(monthN - 1)],
+                        resultActual[Number(monthN - 2)],
+                      ],
+                      backgroundColor: "#00b541",
+                      borderColor: "#00b541",
+                      borderWidth: 1,
+                    },
+                  ],
+                },
+              };
+              dataDepartementsTemp.push(dataDepartement);;
+            })
+              .catch((err) => {
+                console.error({ err });
+              });
+
+          } catch (err) {
+            console.error({ err });
+          }
         });
+
+        this.setState({
+          dataDepartements: dataDepartementsTemp
+        })
       })
       .catch((err) => {
         console.error({ err });
       });
 
+  };
+
+
+
+  getList = (year) => {
     axios
       .get(apis.server + "/dashboard/target-breakdown-all", {
         params: {
           tahun: year,
         },
         headers: {
-          Authorization: `Bearer ${
-            localStorage.token ? localStorage.token : ""
-          }`,
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
         },
       })
       .then((res) => {
@@ -208,142 +162,21 @@ export class AdminDashboard extends Component {
       .catch((err) => {
         console.error({ err });
       });
-
-    axios
-      .get(apis.server + "/dashboard/target-actual", {
-        params: {
-          bup: "MOTIO",
-          tahun: year,
-        },
-        headers: {
-          Authorization: `Bearer ${
-            localStorage.token ? localStorage.token : ""
-          }`,
-        },
-      })
-      .then((res) => {
-        var resultActual = res.data.data.actual.map(function (x) {
-          return Number(x);
-        });
-
-        var resultTarget = res.data.data.target.map(function (x) {
-          return Number(x);
-        });
-
-        const d = new Date();
-        let monthN = d.getMonth();
-        this.setState({
-          resultDataActualMotio: resultActual,
-          resultDataTargetMotio: resultTarget,
-          dataChartMotio: {
-            labels: [
-              months[Number(monthN)],
-              months[Number(monthN - 1)],
-              months[Number(monthN - 2)],
-            ],
-            datasets: [
-              {
-                label: "Target",
-                data: [
-                  resultTarget[Number(monthN)],
-                  resultTarget[Number(monthN - 1)],
-                  resultTarget[Number(monthN - 2)],
-                ],
-                backgroundColor: "#3b71ca",
-                borderColor: "#3b71ca",
-                borderWidth: 1,
-              },
-              {
-                label: "Actual",
-                data: [
-                  resultActual[Number(monthN)],
-                  resultActual[Number(monthN - 1)],
-                  resultActual[Number(monthN - 2)],
-                ],
-                backgroundColor: "#00b541",
-                borderColor: "#00b541",
-                borderWidth: 1,
-              },
-            ],
-          },
-        });
-      })
-      .catch((err) => {
-        console.error({ err });
-      });
-
-    axios
-      .get(apis.server + "/dashboard/target-actual", {
-        params: {
-          bup: "SWAMEDIA",
-          tahun: year,
-        },
-        headers: {
-          Authorization: `Bearer ${
-            localStorage.token ? localStorage.token : ""
-          }`,
-        },
-      })
-      .then((res) => {
-        var resultActual = res.data.data.actual.map(function (x) {
-          return Number(x);
-        });
-
-        var resultTarget = res.data.data.target.map(function (x) {
-          return Number(x);
-        });
-
-        const d = new Date();
-        let monthN = d.getMonth();
-        this.setState({
-          resultDataActualSwamedia: resultActual,
-          resultDataTargetSwamedia: resultTarget,
-          dataChartSwamedia: {
-            labels: [
-              months[Number(monthN)],
-              months[Number(monthN - 1)],
-              months[Number(monthN - 2)],
-            ],
-            datasets: [
-              {
-                label: "Target",
-                data: [
-                  resultTarget[Number(monthN)],
-                  resultTarget[Number(monthN - 1)],
-                  resultTarget[Number(monthN - 2)],
-                ],
-                backgroundColor: "#3b71ca",
-                borderColor: "#3b71ca",
-                borderWidth: 1,
-              },
-              {
-                label: "Actual",
-                data: [
-                  resultActual[Number(monthN)],
-                  resultActual[Number(monthN - 1)],
-                  resultActual[Number(monthN - 2)],
-                ],
-                backgroundColor: "#00b541",
-                borderColor: "#00b541",
-                borderWidth: 1,
-              },
-            ],
-          },
-        });
-      })
-      .catch((err) => {
-        console.error({ err });
-      });
-      setTimeout(() => {
-        // Set openLoad to false to hide the loader when the data is loaded
-        this.setState({
-          openLoad: false,
-        });
-      }, 2000); // You can adjust the delay as needed
   };
 
   componentDidMount() {
+    this.setState({
+      openLoad: true
+    })
     this.getList(this.state.filterYear);
+    this.fetchDataForDepartment(this.state.filterYear);
+    setTimeout(() => {
+      // Set openLoad to false to hide the loader when the data is loaded
+      this.setState({
+        openLoad: false,
+      });
+    }, 3000); // You can adjust the delay as needed
+
   }
 
   render() {
@@ -388,198 +221,47 @@ export class AdminDashboard extends Component {
     const d = new Date();
     let monthN = d.getMonth();
     let year = d.getFullYear();
-    let monthArray=[];
+    let monthArray = [];
     for (let i = 0; i <= monthN; i++) {
       monthArray.push(months[i]);
     }
+
+    // Initialize an array to store the calculated sums
+    var sums = {
+      Target: Array(12).fill(0),
+      Actual: Array(12).fill(0)
+    };
+
+    // Loop through each item in dataDepartement
+    this.state.dataDepartements.forEach((item) => {
+      // Loop through each month
+      item.resultDataTarget.forEach((value, index) => {
+        // Sum the values for Target and Actual
+        sums.Target[index] += value;
+        sums.Actual[index] += item.resultDataActual[index];
+      });
+    });
+
+
     const data = {
-      labels:this.state.filterYear===year?monthArray:months,
+      labels: this.state.filterYear === year ? monthArray : months,
       datasets: [
         {
           label: "Target",
-          data: [
-            round(
-              Number(
-                this.state.resultDataTargetSwadama[0] +
-                  this.state.resultDataTargetSwamedia[0] +
-                  this.state.resultDataTargetMotio[0]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataTargetSwadama[1] +
-                  this.state.resultDataTargetSwamedia[1] +
-                  this.state.resultDataTargetMotio[1]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataTargetSwadama[2] +
-                  this.state.resultDataTargetSwamedia[2] +
-                  this.state.resultDataTargetMotio[2]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataTargetSwadama[3] +
-                  this.state.resultDataTargetSwamedia[3] +
-                  this.state.resultDataTargetMotio[3]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataTargetSwadama[4] +
-                  this.state.resultDataTargetSwamedia[4] +
-                  this.state.resultDataTargetMotio[4]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataTargetSwadama[5] +
-                  this.state.resultDataTargetSwamedia[5] +
-                  this.state.resultDataTargetMotio[5]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataTargetSwadama[6] +
-                  this.state.resultDataTargetSwamedia[6] +
-                  this.state.resultDataTargetMotio[6]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataTargetSwadama[7] +
-                  this.state.resultDataTargetSwamedia[7] +
-                  this.state.resultDataTargetMotio[7]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataTargetSwadama[8] +
-                  this.state.resultDataTargetSwamedia[8] +
-                  this.state.resultDataTargetMotio[8]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataTargetSwadama[9] +
-                  this.state.resultDataTargetSwamedia[9] +
-                  this.state.resultDataTargetMotio[9]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataTargetSwadama[10] +
-                  this.state.resultDataTargetSwamedia[10] +
-                  this.state.resultDataTargetMotio[10]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataTargetSwadama[11] +
-                  this.state.resultDataTargetSwamedia[11] +
-                  this.state.resultDataTargetMotio[11]
-              )
-            ),
-          ],
+          data: sums.Target.map((value) => round(value)),
           backgroundColor: "#3b71ca",
           borderColor: "#3b71ca",
           borderWidth: 1,
         },
         {
           label: "Actual",
-          data: [
-            round(
-              Number(
-                this.state.resultDataActualSwadama[0] +
-                  this.state.resultDataActualSwamedia[0] +
-                  this.state.resultDataActualMotio[0]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataActualSwadama[1] +
-                  this.state.resultDataActualSwamedia[1] +
-                  this.state.resultDataActualMotio[1]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataActualSwadama[2] +
-                  this.state.resultDataActualSwamedia[2] +
-                  this.state.resultDataActualMotio[2]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataActualSwadama[3] +
-                  this.state.resultDataActualSwamedia[3] +
-                  this.state.resultDataActualMotio[3]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataActualSwadama[4] +
-                  this.state.resultDataActualSwamedia[4] +
-                  this.state.resultDataActualMotio[4]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataActualSwadama[5] +
-                  this.state.resultDataActualSwamedia[5] +
-                  this.state.resultDataActualMotio[5]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataActualSwadama[6] +
-                  this.state.resultDataActualSwamedia[6] +
-                  this.state.resultDataActualMotio[6]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataActualSwadama[7] +
-                  this.state.resultDataActualSwamedia[7] +
-                  this.state.resultDataActualMotio[7]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataActualSwadama[8] +
-                  this.state.resultDataActualSwamedia[8] +
-                  this.state.resultDataActualMotio[8]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataActualSwadama[9] +
-                  this.state.resultDataActualSwamedia[9] +
-                  this.state.resultDataActualMotio[9]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataActualSwadama[10] +
-                  this.state.resultDataActualSwamedia[10] +
-                  this.state.resultDataActualMotio[10]
-              )
-            ),
-            round(
-              Number(
-                this.state.resultDataActualSwadama[11] +
-                  this.state.resultDataActualSwamedia[11] +
-                  this.state.resultDataActualMotio[11]
-              )
-            ),
-          ],
+          data: sums.Actual.map((value) => round(value)),
           backgroundColor: "#00b541",
           borderColor: "#00b541",
           borderWidth: 1,
         },
       ],
+
     };
 
     const optionHorizontal = {
@@ -621,7 +303,7 @@ export class AdminDashboard extends Component {
       <div>
         <Header />
         <div className="right-content">
-        <Backdrop
+          <Backdrop
             sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
             open={this.state.openLoad}
           >
@@ -759,41 +441,26 @@ export class AdminDashboard extends Component {
               </div>
             </div>
             <div className="row">
-            <LabelContainer
-                tittle={"SWADAMA"}
-                boxColor="#00b541"
-                year={this.state.filterYear}
-              />
-              <LabelContainer
-                tittle={"MOTIO"}
-                boxColor="#0070c6"
-                year={this.state.filterYear}
-              />
-              <LabelContainer
-                tittle={"SWAMEDIA"}
-                boxColor="#7b24a6"
-                year={this.state.filterYear}
-              />
+              {this.state.dataDepartements.map((departement1, index) => (
+                <LabelContainer
+                  key={departement1.id}
+                  tittle={departement1.name}
+                  id={departement1.id}
+                  boxColor={index == 0 ? "#00b541" : index === 1 ? "#0070c6" : "#7b24a6"}
+                  year={this.state.filterYear}
+                />
+              ))}
             </div>
             <div className="row">
-              <BarChart
-                options={optionHorizontal.options}
-                className="width-30"
-                tittle="SWADAMA - Achievements of the Last 3 Months (in billion Rp.)"
-                data={this.state.dataChartSwadama}
-              />
-              <BarChart
-                options={optionHorizontal.options}
-                className="width-30"
-                tittle="MOTIO - Achievements of the Last 3 Months (in billion Rp.)"
-                data={this.state.dataChartMotio}
-              />
-              <BarChart
-                options={optionHorizontal.options}
-                className="width-30"
-                tittle="SWAMEDIA - Achievements of the Last 3 Months (in billion Rp.)"
-                data={this.state.dataChartSwamedia}
-              />
+              {this.state.dataDepartements.map((departement1, index) => (
+                <BarChart
+                  key={"bar-chart-"+departement1.id}
+                  options={optionHorizontal.options}
+                  className="width-30"
+                  tittle={departement1.name + " - Achievements of the Last 3 Months (in billion Rp.)"}
+                  data={departement1.dataChart}
+                />
+              ))}
             </div>
           </div>
         </div>

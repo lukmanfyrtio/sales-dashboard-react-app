@@ -74,7 +74,6 @@ function CustomerPage() {
     },
   };
 
-  const BUPLists = localStorage.bup==="ALL"?["SWAMEDIA", "MOTIO", "SWADAMA"]:[localStorage.bup];
   const statusList = ["Open", "Close"];
   const currentStageList = [
     "Opportunities",
@@ -84,9 +83,11 @@ function CustomerPage() {
     "Dropped",
   ];
 
-  const [BUP, setBUP] = React.useState(
+  const [departmentId, setDepartmentId] = React.useState(
     localStorage.bup === "ALL" ? "" : localStorage.bup
   );
+
+  const [departmentLists, setDepartmentLists] = React.useState([]);
   const [Stage, setStage] = React.useState("");
   const [Status, setStatus] = React.useState("");
   const [Search, setSearch] = React.useState("");
@@ -122,9 +123,8 @@ function CustomerPage() {
     axios
       .delete(apis.server + `/dashboard/delete/${id}`, {
         headers: {
-          Authorization: `Bearer ${
-            localStorage.token ? localStorage.token : ""
-          }`,
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
         },
       })
       .then((res) => {
@@ -141,7 +141,7 @@ function CustomerPage() {
 
   useEffect(() => {
     getList();
-  }, [BUP, Stage, Status, Search, page, rowsPerPage]);
+  }, [departmentId, Stage, Status, Search, page, rowsPerPage]);
 
 
   function formatRupiah(angka, prefix) {
@@ -159,13 +159,27 @@ function CustomerPage() {
     rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
     return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
   }
-  
+
   const getList = () => {
     setOpenLoad(true);
+
     axios
-      .get(apis.server + "/dashboard/list", {
+      .get(apis.server + `/departments`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
+        },
+      })
+      .then((res) => {
+        setDepartmentLists(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    axios
+      .get(apis.server + "/salesleads/filter", {
         params: {
-          bup: BUP ? BUP : null,
+          departmentId: departmentId ? departmentId : null,
           stage: Stage ? Stage : null,
           status: Status ? Status : null,
           search: Search ? Search : null,
@@ -173,14 +187,13 @@ function CustomerPage() {
           size: rowsPerPage,
         },
         headers: {
-          Authorization: `Bearer ${
-            localStorage.token ? localStorage.token : ""
-          }`,
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
         },
       })
       .then((res) => {
-        setList(res.data.data.content);
-        setTotalElements(res.data.data.totalElements);
+        setList(res.data.content);
+        setTotalElements(res.data.totalElements);
         setOpenLoad(false);
       })
       .catch((err) => {
@@ -258,27 +271,26 @@ function CustomerPage() {
                   } else {
                     navigate("/403");
                   }
-                }else{
+                } else {
                   if (deletePr == 1) {
                     setOpenLoad(true);
-                      axios
-                        .delete(apis.server + `/dashboard/deleteall`, {
-                          headers: {
-                            Authorization: `Bearer ${
-                              localStorage.token ? localStorage.token : ""
+                    axios
+                      .delete(apis.server + `/dashboard/deleteall`, {
+                        headers: {
+                          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
                             }`,
-                          },
-                        })
-                        .then((res) => {
-                          if (res.data.statusCode == 200) {
-                            getList();
-                            setOpenLoad(false);
-                            setOpen(false);
-                          }
-                        })
-                        .catch((err) => {
-                          console.log(err);
-                        });
+                        },
+                      })
+                      .then((res) => {
+                        if (res.data.statusCode == 200) {
+                          getList();
+                          setOpenLoad(false);
+                          setOpen(false);
+                        }
+                      })
+                      .catch((err) => {
+                        console.log(err);
+                      });
                   } else {
                     navigate("/403");
                   }
@@ -318,24 +330,24 @@ function CustomerPage() {
                   className="input-style"
                   size="small"
                   displayEmpty
-                  value={BUP}
-                  onChange={(e) => setBUP(e.target.value)}
+                  value={departmentLists.find((departement) => departement.id === departmentId)?.name}
+                  onChange={(e) => setDepartmentId(departmentLists.find((departement) => departement.name === e.target.value)?.id)}
                   input={<OutlinedInput />}
                   renderValue={(selected) => {
                     if (selected) {
                       return <label style={getStyles()}>{selected}</label>;
                     }
-                    return <em style={getStyles()}>Company</em>;
+                    return <em style={getStyles()}>Unit</em>;
                   }}
                   MenuProps={MenuProps}
                   inputProps={{ "aria-label": "Without label" }}
                 >
                   <MenuItem key="1" value="" style={getStyles()}>
-                    <em>Pilih Company</em>
+                    <em>Pilih Unit</em>
                   </MenuItem>
-                  {BUPLists.map((name) => (
-                    <MenuItem key={name} value={name} style={getStyles()}>
-                      {name}
+                  {departmentLists.map((departement, index) => (
+                    <MenuItem key={departement.id} value={departement.name} id={departement.id} style={getStyles()}>
+                      {departement.name}
                     </MenuItem>
                   ))}
                 </Select>
@@ -439,9 +451,8 @@ function CustomerPage() {
 
                     method,
                     headers: {
-                      Authorization: `Bearer ${
-                        localStorage.token ? localStorage.token : ""
-                      }`,
+                      Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+                        }`,
                     },
 
                     responseType: "blob", //important
@@ -471,7 +482,7 @@ function CustomerPage() {
 
                     // Create the static string with the timestamp
                     const staticString = `Customer_${formattedTimestamp}`;
-                    link.setAttribute("download", staticString+".xlsx"); //any other extension
+                    link.setAttribute("download", staticString + ".xlsx"); //any other extension
 
                     document.body.appendChild(link);
 
@@ -491,14 +502,14 @@ function CustomerPage() {
               className="button-c"
               onClick={() => {
                 if (deletePr == 1) {
-                setOpen(true);
-                setModalTittle("Warning - Delete ALL");
-                setModalMessage(
-                  "Apakah anda yakin ingin menghapus semua data ?"
-                );
-              } else {
-                navigate("/403");
-              }
+                  setOpen(true);
+                  setModalTittle("Warning - Delete ALL");
+                  setModalMessage(
+                    "Apakah anda yakin ingin menghapus semua data ?"
+                  );
+                } else {
+                  navigate("/403");
+                }
               }}
             >
               <div className="btn-padding">
@@ -536,6 +547,7 @@ function CustomerPage() {
                     Potential Customer Name
                   </StyledTableCell>
                   <StyledTableCell align="center">Product</StyledTableCell>
+                  <StyledTableCell align="center">Unit/Department</StyledTableCell>
                   <StyledTableCell align="center">
                     Current Stage
                   </StyledTableCell>
@@ -565,61 +577,63 @@ function CustomerPage() {
                       <span
                         cl="dot"
                         style={{
-                          backgroundColor: `${
-                            row.currentStage == "Opportunities"
+                          backgroundColor: `${row.currentStage == "Opportunities"
                               ? row.countDays > 10
                                 ? "red"
                                 : row.countDays > 8
-                                ? "yellow"
-                                : "green"
+                                  ? "yellow"
+                                  : "green"
                               : row.currentStage == "Proposal"
-                              ? row.countDays > 20
-                                ? "red"
-                                : row.countDays > 18
-                                ? "yellow"
-                                : "green"
-                              : row.currentStage == "Proposal"
-                              ? row.countDays > 20
-                                ? "red"
-                                : row.countDays > 18
-                                ? "yellow"
-                                : "green"
-                              : row.currentStage == "Negotiation"
-                              ? row.countDays > 40
-                                ? "red"
-                                : row.countDays > 40 - 2
-                                ? "yellow"
-                                : "green"
-                              : row.currentStage == "Deals"
-                              ? row.countDays > 20
-                                ? "red"
-                                : row.countDays > 20 - 2
-                                ? "yellow"
-                                : "green"
-                              : row.currentStage == "Dropped"
-                              ? row.countDays > 20
-                                ? "red"
-                                : row.countDays > 20 - 2
-                                ? "yellow"
-                                : "green":""
-                          }`,
+                                ? row.countDays > 20
+                                  ? "red"
+                                  : row.countDays > 18
+                                    ? "yellow"
+                                    : "green"
+                                : row.currentStage == "Proposal"
+                                  ? row.countDays > 20
+                                    ? "red"
+                                    : row.countDays > 18
+                                      ? "yellow"
+                                      : "green"
+                                  : row.currentStage == "Negotiation"
+                                    ? row.countDays > 40
+                                      ? "red"
+                                      : row.countDays > 40 - 2
+                                        ? "yellow"
+                                        : "green"
+                                    : row.currentStage == "Deals"
+                                      ? row.countDays > 20
+                                        ? "red"
+                                        : row.countDays > 20 - 2
+                                          ? "yellow"
+                                          : "green"
+                                      : row.currentStage == "Dropped"
+                                        ? row.countDays > 20
+                                          ? "red"
+                                          : row.countDays > 20 - 2
+                                            ? "yellow"
+                                            : "green" : ""
+                            }`,
                         }}
                       ></span>
                     </StyledTableCell>
                     <StyledTableCell component="th" scope="row">
-                      {row.bup ? row.bup : "-"}
+                      {row.product.department.company.name ? row.product.department.company.name : "-"}
                     </StyledTableCell>
                     <StyledTableCell component="th" scope="row">
-                      {row.bulan ? row.bulan : "-"}
+                      {row.month ? row.month : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
                       {row.salesName ? row.salesName : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.calonPelanggan ? row.calonPelanggan : "-"}
+                      {row.potentialCustomer ? row.potentialCustomer : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.produk ? row.produk : "-"}
+                      {row.product.name ? row.product.name : "-"}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      {row.product.department.name ? row.product.department.name : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
                       {row.currentStage ? row.currentStage : "-"}
@@ -631,12 +645,12 @@ function CustomerPage() {
                       {row.leadsStatus ? row.leadsStatus : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.proyeksiNilai
-                        ? formatRupiah(row.proyeksiNilai, "RP .")
+                      {row.projectedValue
+                        ? formatRupiah(row.projectedValue, "RP .")
                         : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.keterangan ? row.keterangan : "-"}
+                      {row.notes ? row.notes : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
                       <Stack direction="row" spacing={1}>

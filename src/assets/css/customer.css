@@ -45,7 +45,5 @@
   @media screen and (max-width: 480px) {
       .tittle-content {
           margin: 2rem;
-          margin-right: 0;
-          margin-bottom: 1rem;
       }
   }
