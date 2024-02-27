@@ -24,67 +24,6 @@ import Stack from "@mui/material/Stack";
 import apis from "../apis.js";
 
 function SalesTargetPage() {
-
-
-  const BUPLists = localStorage.bup==="ALL"?["SWAMEDIA", "MOTIO", "SWADAMA"]:[localStorage.bup];
-
-  const [BUP, setBUP] = React.useState(localStorage.bup==="ALL"?"":localStorage.bup);
-  const [Search, setSearch] = React.useState("");
-  const [list, setList] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [totalElements, setTotalElements] = React.useState(0);
-
-  const handleDelete = (bup,tahun) => {
-    axios
-      .delete(apis.server + `/sales-target/delete/${tahun}`, {
-        headers: {
-          Authorization: `Bearer ${
-            localStorage.token ? localStorage.token : ""
-          }`,
-        },
-        params: {
-          bup:bup
-        }
-      })
-      .then((res) => {
-        if (res.data.statusCode == 200) {
-          getList();
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  useEffect(() => {
-    getList();
-  }, [BUP, Search, page, rowsPerPage]);
-
-  const getList = () => {
-    axios
-      .get(apis.server + "/sales-target/list", {
-        params: {
-          bup: BUP ? BUP : null,
-          search: Search ? Search : null,
-          page: page,
-          size: rowsPerPage,
-        },
-        headers: {
-          Authorization: `Bearer ${
-            localStorage.token ? localStorage.token : ""
-          }`,
-        },
-      })
-      .then((res) => {
-        setList(res.data.data.content);
-        setTotalElements(res.data.data.totalElements);
-      })
-      .catch((err) => {
-        console.error({ err });
-      });
-  };
-
   const navigate = useNavigate();
   const ITEM_HEIGHT = 30;
   const ITEM_PADDING_TOP = 8;
@@ -103,14 +42,6 @@ function SalesTargetPage() {
       fontFamily: "Poppins",
     };
   }
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(event.target.value);
-    setPage(0);
-  };
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -132,9 +63,88 @@ function SalesTargetPage() {
     },
   }));
 
+  const [departmentLists, setDepartmentLists] = React.useState([]);
+  const [departmentId, setDepartmentId] = React.useState("");
+  const [Search, setSearch] = React.useState("");
+
+
+  const [list, setList] = React.useState([]);
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [totalElements, setTotalElements] = React.useState(0);
+
   const [create, setCreate] = React.useState(1);
   const [update, setUpdate] = React.useState(1);
   const [deletePr, setDeletePr] = React.useState(1);
+
+  const handleDelete = (year,id) => {
+    axios
+      .delete(apis.server + `/company-targets/${id}/${year}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
+        },
+      })
+      .then((res) => {
+          getList();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getList = () => {
+    axios
+      .get(apis.server + "/company-targets/filter", {
+        params: {
+          departmentId: departmentId ? departmentId : null,
+          search: Search ? Search : null,
+          page: page,
+          size: rowsPerPage,
+        },
+        headers: {
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
+        },
+      })
+      .then((res) => {
+        setList(res.data.content);
+        setTotalElements(res.data.totalElements);
+      })
+      .catch((err) => {
+        console.error({ err });
+      });
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(event.target.value);
+    setPage(0);
+  };
+
+  const fetchUnitData = () => {
+    axios
+      .get(apis.server + `/departments`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
+        },
+      })
+      .then((res) => {
+        setDepartmentLists(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  useEffect(() => {
+    getList();
+    fetchUnitData();
+  }, [departmentId, Search, page, rowsPerPage]);
 
   return (
     <div>
@@ -143,36 +153,36 @@ function SalesTargetPage() {
         <div className="tittle-content">Target & Existing</div>
         <div className="row center-row">
           <div className="filter-row">
-          {localStorage.bup==="ALL"?
-            <FormControl sx={{ m: 0, width: 200, mt: 0 }}>
-              <Select
-                id="BUP"
-                className="input-style"
-                size="small"
-                displayEmpty
-                value={BUP}
-                onChange={(e) => setBUP(e.target.value)}
-                input={<OutlinedInput />}
-                renderValue={(selected) => {
-                  if (selected) {
-                    return <label style={getStyles()}>{selected}</label>;
-                  }
-                  return <em style={getStyles()}>Company</em>;
-                }}
-                MenuProps={MenuProps}
-                inputProps={{ "aria-label": "Without label" }}
-              >
-                <MenuItem key="1" value="" style={getStyles()}>
-                  <em>Pilih Company</em>
-                </MenuItem>
-                {BUPLists.map((name) => (
-                  <MenuItem key={name} value={name} style={getStyles()}>
-                    {name}
+            {localStorage.bup === "ALL" ?
+              <FormControl sx={{ m: 0, width: 200, mt: 0 }}>
+                <Select
+                  id="BUP"
+                  className="input-style"
+                  size="small"
+                  displayEmpty
+                  value={departmentLists.find((departement) => departement.id === departmentId)?.name}
+                  onChange={(e) => setDepartmentId(departmentLists.find((departement) => departement.name === e.target.value)?.id)}
+                  input={<OutlinedInput />}
+                  renderValue={(selected) => {
+                    if (selected) {
+                      return <label style={getStyles()}>{selected}</label>;
+                    }
+                    return <em style={getStyles()}>Unit</em>;
+                  }}
+                  MenuProps={MenuProps}
+                  inputProps={{ "aria-label": "Without label" }}
+                >
+                  <MenuItem key="1" value="" style={getStyles()}>
+                    <em>Pilih Unit</em>
                   </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            :""}
+                  {departmentLists.map((departement, index) => (
+                    <MenuItem key={departement.id} value={departement.name} id={departement.id} style={getStyles()}>
+                      {departement.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              : ""}
 
             <div className="search-bar  input-style">
               <input
@@ -207,7 +217,7 @@ function SalesTargetPage() {
             <Table sx={{ minWidth: 700 }} aria-label="customized table">
               <TableHead>
                 <TableRow>
-                  <StyledTableCell>BUP</StyledTableCell>
+                  <StyledTableCell>Unit/Department</StyledTableCell>
                   <StyledTableCell align="center">Year</StyledTableCell>
                   <StyledTableCell align="center">Target</StyledTableCell>
                   <StyledTableCell align="center">Existing</StyledTableCell>
@@ -228,10 +238,10 @@ function SalesTargetPage() {
                 {list.map((row) => (
                   <StyledTableRow key={row.id}>
                     <StyledTableCell component="th" scope="row">
-                      {row.bup ? row.bup : "-"}
+                      {row.department.name ? row.department.name: "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.tahun ? row.tahun : "-"}
+                      {row.year ? row.year : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
                       {row.target ? row.target : "-"}
@@ -246,7 +256,7 @@ function SalesTargetPage() {
                           color="error"
                           onClick={(_) => {
                             if (deletePr == 1) {
-                              handleDelete(row.bup,row.tahun);
+                              handleDelete(row.year, row.department.id);
                             } else {
                               navigate("/403");
                             }

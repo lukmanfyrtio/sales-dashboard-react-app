@@ -74,6 +74,34 @@ function CustomerPage() {
     },
   };
 
+  const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+      backgroundColor: "#E5EDFF",
+      color: "#8697B6",
+      fontWeight: "bold",
+      fontFamily: "Poppins",
+    },
+    [`&.${tableCellClasses.body}`]: {
+      fontSize: "small",
+      fontFamily: "Poppins",
+    },
+  }));
+
+  const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    // hide last border
+    "&:last-child td, &:last-child th": {
+      border: 0,
+    },
+  }));
+
+  function getStyles() {
+    return {
+      fontSize: "0.7rem",
+      color: "grey",
+      fontFamily: "Poppins",
+    };
+  }
+
   const statusList = ["Open", "Close"];
   const currentStageList = [
     "Opportunities",
@@ -83,14 +111,13 @@ function CustomerPage() {
     "Dropped",
   ];
 
-  const [departmentId, setDepartmentId] = React.useState(
-    localStorage.bup === "ALL" ? "" : localStorage.bup
-  );
+  const [departmentId, setDepartmentId] = React.useState("");
 
   const [departmentLists, setDepartmentLists] = React.useState([]);
   const [Stage, setStage] = React.useState("");
   const [Status, setStatus] = React.useState("");
   const [Search, setSearch] = React.useState("");
+
   const [list, setList] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -99,6 +126,16 @@ function CustomerPage() {
   const [create, setCreate] = React.useState(1);
   const [update, setUpdate] = React.useState(1);
   const [deletePr, setDeletePr] = React.useState(1);
+  const [deletedID, setDeletedID] = React.useState(null);
+
+
+  const [openLoad, setOpenLoad] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
+  const [modalTittle, setModalTittle] = React.useState("Information");
+  const [modalMessage, setModalMessage] = React.useState(
+    "Data berhasil disimpan"
+  );
+
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -109,73 +146,7 @@ function CustomerPage() {
     setPage(0);
   };
 
-  function getStyles() {
-    return {
-      fontSize: "0.7rem",
-      color: "grey",
-      fontFamily: "Poppins",
-    };
-  }
-
-  const handleDelete = (id) => {
-    setOpenLoad(true);
-    setOpen(false)
-    axios
-      .delete(apis.server + `/dashboard/delete/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
-            }`,
-        },
-      })
-      .then((res) => {
-        if (res.data.statusCode == 200) {
-          getList();
-          setOpenLoad(false);
-          setOpen(false)
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  useEffect(() => {
-    getList();
-  }, [departmentId, Stage, Status, Search, page, rowsPerPage]);
-
-
-  function formatRupiah(angka, prefix) {
-    var number_string = angka.replace(/[^,\d]/g, "").toString();
-    var split = number_string.split(",");
-    var sisa = split[0].length % 3;
-    var rupiah = split[0].substr(0, sisa);
-    var ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-    if (ribuan) {
-      var separator = sisa ? "." : "";
-      rupiah += separator + ribuan.join(".");
-    }
-
-    rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
-    return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
-  }
-
   const getList = () => {
-    setOpenLoad(true);
-
-    axios
-      .get(apis.server + `/departments`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
-            }`,
-        },
-      })
-      .then((res) => {
-        setDepartmentLists(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
     axios
       .get(apis.server + "/salesleads/filter", {
         params: {
@@ -194,41 +165,72 @@ function CustomerPage() {
       .then((res) => {
         setList(res.data.content);
         setTotalElements(res.data.totalElements);
-        setOpenLoad(false);
       })
       .catch((err) => {
         console.error({ err });
       });
   };
 
-  const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: "#E5EDFF",
-      color: "#8697B6",
-      fontWeight: "bold",
-      fontFamily: "Poppins",
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: "small",
-      fontFamily: "Poppins",
-    },
-  }));
+  const handleDelete = (id) => {
+    setOpen(false)
+    setOpenLoad(true);
+    axios
+      .delete(apis.server + `/salesleads/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
+        },
+      })
+      .then((res) => {
+        if (res.status === 204) {
+          getList();
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    setOpenLoad(false);
+    setOpen(false)
+  };
 
-  const [openLoad, setOpenLoad] = React.useState(false);
+  function formatRupiah(angka, prefix) {
+    var number_string = angka.replace(/[^,\d]/g, "").toString();
+    var split = number_string.split(",");
+    var sisa = split[0].length % 3;
+    var rupiah = split[0].substr(0, sisa);
+    var ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-  const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    // hide last border
-    "&:last-child td, &:last-child th": {
-      border: 0,
-    },
-  }));
+    if (ribuan) {
+      var separator = sisa ? "." : "";
+      rupiah += separator + ribuan.join(".");
+    }
 
-  const [deletedID, setDeletedID] = React.useState(null);
-  const [open, setOpen] = React.useState(false);
-  const [modalTittle, setModalTittle] = React.useState("Information");
-  const [modalMessage, setModalMessage] = React.useState(
-    "Data berhasil disimpan"
-  );
+    rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+    return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
+  }
+
+  const fetchUnitData = () => {
+    axios
+      .get(apis.server + `/departments`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
+        },
+      })
+      .then((res) => {
+        setDepartmentLists(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  useEffect(() => {
+    setOpenLoad(true)
+    getList();
+    fetchUnitData();
+    setOpenLoad(false)
+  }, [departmentId, Stage, Status, Search, page, rowsPerPage]);
 
   return (
     <div>
@@ -268,29 +270,6 @@ function CustomerPage() {
                 if (modalTittle === "Warning - Delete") {
                   if (deletePr == 1) {
                     handleDelete(deletedID);
-                  } else {
-                    navigate("/403");
-                  }
-                } else {
-                  if (deletePr == 1) {
-                    setOpenLoad(true);
-                    axios
-                      .delete(apis.server + `/dashboard/deleteall`, {
-                        headers: {
-                          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
-                            }`,
-                        },
-                      })
-                      .then((res) => {
-                        if (res.data.statusCode == 200) {
-                          getList();
-                          setOpenLoad(false);
-                          setOpen(false);
-                        }
-                      })
-                      .catch((err) => {
-                        console.log(err);
-                      });
                   } else {
                     navigate("/403");
                   }
@@ -501,25 +480,6 @@ function CustomerPage() {
             <div
               className="button-c"
               onClick={() => {
-                if (deletePr == 1) {
-                  setOpen(true);
-                  setModalTittle("Warning - Delete ALL");
-                  setModalMessage(
-                    "Apakah anda yakin ingin menghapus semua data ?"
-                  );
-                } else {
-                  navigate("/403");
-                }
-              }}
-            >
-              <div className="btn-padding">
-                <span className="material-icons-sharp">delete</span>
-              </div>
-              <label style={{ color: "#718292" }}>Delete All Data</label>
-            </div>
-            <div
-              className="button-c"
-              onClick={() => {
                 if (create == 1) {
                   navigate("/customer/add");
                 } else {
@@ -578,9 +538,15 @@ function CustomerPage() {
                         cl="dot"
                         style={{
                           backgroundColor: `${row.currentStage == "Opportunities"
-                              ? row.countDays > 10
+                            ? row.countDays > 10
+                              ? "red"
+                              : row.countDays > 8
+                                ? "yellow"
+                                : "green"
+                            : row.currentStage == "Proposal"
+                              ? row.countDays > 20
                                 ? "red"
-                                : row.countDays > 8
+                                : row.countDays > 18
                                   ? "yellow"
                                   : "green"
                               : row.currentStage == "Proposal"
@@ -589,30 +555,24 @@ function CustomerPage() {
                                   : row.countDays > 18
                                     ? "yellow"
                                     : "green"
-                                : row.currentStage == "Proposal"
-                                  ? row.countDays > 20
+                                : row.currentStage == "Negotiation"
+                                  ? row.countDays > 40
                                     ? "red"
-                                    : row.countDays > 18
+                                    : row.countDays > 40 - 2
                                       ? "yellow"
                                       : "green"
-                                  : row.currentStage == "Negotiation"
-                                    ? row.countDays > 40
+                                  : row.currentStage == "Deals"
+                                    ? row.countDays > 20
                                       ? "red"
-                                      : row.countDays > 40 - 2
+                                      : row.countDays > 20 - 2
                                         ? "yellow"
                                         : "green"
-                                    : row.currentStage == "Deals"
+                                    : row.currentStage == "Dropped"
                                       ? row.countDays > 20
                                         ? "red"
                                         : row.countDays > 20 - 2
                                           ? "yellow"
-                                          : "green"
-                                      : row.currentStage == "Dropped"
-                                        ? row.countDays > 20
-                                          ? "red"
-                                          : row.countDays > 20 - 2
-                                            ? "yellow"
-                                            : "green" : ""
+                                          : "green" : ""
                             }`,
                         }}
                       ></span>
@@ -664,7 +624,7 @@ function CustomerPage() {
                               setModalMessage(
                                 "Apakah anda yakin ingin menghapus data ?"
                               );
-                              setDeletedID(row.idPelanggan);
+                              setDeletedID(row.id);
                             } else {
                               navigate("/403");
                             }

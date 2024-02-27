@@ -43,6 +43,7 @@ const style = {
   color: "grey",
   fontFamily: "Poppins",
 };
+
 function SalesInfoPage() {
   const navigate = useNavigate();
   const ITEM_HEIGHT = 30;
@@ -55,20 +56,27 @@ function SalesInfoPage() {
     },
   };
 
-  const BUPLists = localStorage.bup === "ALL" ? ["SWAMEDIA", "MOTIO", "SWADAMA"] : [localStorage.bup];
+  const [departmentLists, setDepartmentLists] = React.useState([]);
+  const [list, setList] = React.useState([]);
 
-  const [BUP, setBUP] = React.useState(
-    localStorage.bup === "ALL" ? "" : localStorage.bup
-  );
-  const [Status, setStatus] = React.useState("");
-  const [Denda, setDenda] = React.useState("");
+  const [departmentId, setDepartmentId] = React.useState("");
   const [Search, setSearch] = React.useState("");
   const [deletedID, setDeletedID] = React.useState(null);
-  const [list, setList] = React.useState([]);
+
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [totalElements, setTotalElements] = React.useState(0);
   const [openLoad, setOpenLoad] = React.useState(false);
+
+  const [create, setCreate] = React.useState(1);
+  const [update, setUpdate] = React.useState(1);
+  const [deletePr, setDeletePr] = React.useState(1);
+
+  const [open, setOpen] = React.useState(false);
+  const [modalTittle, setModalTittle] = React.useState("Information");
+  const [modalMessage, setModalMessage] = React.useState(
+    "Data berhasil disimpan"
+  );
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -104,15 +112,17 @@ function SalesInfoPage() {
   }
 
   const handleDelete = (id) => {
+    setOpenLoad(false);
+    setOpen(true);
     axios
-      .delete(apis.server + `/invoice/delete/${id}`, {
+      .delete(apis.server + `/sales-revenue/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
             }`,
         },
       })
       .then((res) => {
-        if (res.data.statusCode == 200) {
+        if(res.status===204){
           getList();
           setOpenLoad(false);
           setOpen(false);
@@ -123,23 +133,27 @@ function SalesInfoPage() {
       });
   };
 
-  const [create, setCreate] = React.useState(1);
-  const [update, setUpdate] = React.useState(1);
-  const [deletePr, setDeletePr] = React.useState(1);
-
-
-  useEffect(() => {
-    getList();
-  }, [BUP, Status, Denda, Search, page, rowsPerPage]);
+  const fetchUnitData = () => {
+    axios
+      .get(apis.server + `/departments`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
+        },
+      })
+      .then((res) => {
+        setDepartmentLists(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   const getList = () => {
-    setOpenLoad(true)
     axios
-      .get(apis.server + "/invoice/list", {
+      .get(apis.server + "/sales-revenue/filter", {
         params: {
-          bup: BUP ? BUP : null,
-          denda: Denda ? Denda : null,
-          status: Status ? Status : null,
+          departmentId: departmentId ? departmentId : null,
           search: Search ? Search : null,
           page: page,
           size: rowsPerPage,
@@ -150,9 +164,8 @@ function SalesInfoPage() {
         },
       })
       .then((res) => {
-        setList(res.data.data.content);
-        setTotalElements(res.data.data.totalElements);
-        setOpenLoad(false)
+        setList(res.data.content);
+        setTotalElements(res.data.totalElements);
       })
       .catch((err) => {
         console.error({ err });
@@ -199,11 +212,12 @@ function SalesInfoPage() {
   }
 
 
-  const [open, setOpen] = React.useState(false);
-  const [modalTittle, setModalTittle] = React.useState("Information");
-  const [modalMessage, setModalMessage] = React.useState(
-    "Data berhasil disimpan"
-  );
+  useEffect(() => {
+    setOpenLoad(true)
+    getList();
+    fetchUnitData();
+    setOpenLoad(false)
+  }, [departmentId, Search, page, rowsPerPage]);
 
   return (
     <div>
@@ -244,33 +258,8 @@ function SalesInfoPage() {
               <div
                 className="btn-half"
                 onClick={() => {
-                  if (modalTittle === "Warning - Delete ALL") {
-                    if (deletePr == 1) {
-                      setOpenLoad(true);
-                      axios
-                        .delete(apis.server + `/invoice/deleteall`, {
-                          headers: {
-                            Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
-                              }`,
-                          },
-                        })
-                        .then((res) => {
-                          if (res.data.statusCode == 200) {
-                            getList();
-                            setOpenLoad(false);
-                            setOpen(false);
-                          }
-                        })
-                        .catch((err) => {
-                          console.log(err);
-                        });
-                    } else {
-                      navigate("/403");
-                    }
-                  } else {
                     handleDelete(deletedID);
                     setOpenLoad(false);
-                  }
                 }}
               >
                 OK
@@ -302,24 +291,24 @@ function SalesInfoPage() {
                   className="input-style"
                   size="small"
                   displayEmpty
-                  value={BUP}
-                  onChange={(e) => setBUP(e.target.value)}
+                  value={departmentLists.find((departement) => departement.id === departmentId)?.name}
+                  onChange={(e) => setDepartmentId(departmentLists.find((departement) => departement.name === e.target.value)?.id)}
                   input={<OutlinedInput />}
                   renderValue={(selected) => {
                     if (selected) {
                       return <label style={getStyles()}>{selected}</label>;
                     }
-                    return <em style={getStyles()}>Company</em>;
+                    return <em style={getStyles()}>Unit</em>;
                   }}
                   MenuProps={MenuProps}
                   inputProps={{ "aria-label": "Without label" }}
                 >
                   <MenuItem key="1" value="" style={getStyles()}>
-                    <em>Pilih Company</em>
+                    <em>Pilih Unit</em>
                   </MenuItem>
-                  {BUPLists.map((name) => (
-                    <MenuItem key={name} value={name} style={getStyles()}>
-                      {name}
+                  {departmentLists.map((departement, index) => (
+                    <MenuItem key={departement.id} value={departement.name} id={departement.id} style={getStyles()}>
+                      {departement.name}
                     </MenuItem>
                   ))}
                 </Select>
@@ -401,25 +390,6 @@ function SalesInfoPage() {
             <div
               className="button-c"
               onClick={() => {
-                if (deletePr == 1) {
-                  setOpen(true);
-                  setModalTittle("Warning - Delete ALL");
-                  setModalMessage(
-                    "Apakah anda yakin ingin menghapus semua data ?"
-                  );
-                } else {
-                  navigate("/403");
-                }
-              }}
-            >
-              <div className="btn-padding">
-                <span className="material-icons-sharp">delete</span>
-              </div>
-              <label style={{ color: "#718292" }}>Delete All Data</label>
-            </div>
-            <div
-              className="button-c"
-              onClick={() => {
                 if (create == 1) {
                   navigate("/sales/add");
                 } else {
@@ -446,7 +416,7 @@ function SalesInfoPage() {
                   </StyledTableCell>
                   <StyledTableCell align="center">Invoice Date</StyledTableCell>
                   <StyledTableCell align="center">
-                  Customer's Invoice Received Date
+                    Unit/Department
                   </StyledTableCell>
                   <StyledTableCell align="center">
                     Due Date
@@ -475,37 +445,37 @@ function SalesInfoPage() {
                 {list.map((row) => (
                   <StyledTableRow key={row.id}>
                     <StyledTableCell component="th" scope="row">
-                      {row.bup ? row.bup : "-"}
+                      {row.department.company.name ? row.department.company.name : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.tenant ? row.tenant : "-"}
+                      {row.salesLeads.potentialCustomer ? row.salesLeads.potentialCustomer : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.nomerInvoice ? row.nomerInvoice : "-"}
+                      {row.invoiceNumber ? row.invoiceNumber : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.tglInvoice
-                        ? row.tglInvoice
+                      {row.invoiceDate
+                        ? row.invoiceDate
                         : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.tglInvoiceDiterimaTenant ? row.tglInvoiceDiterimaTenant : "-"}
+                      {row.department.name ? row.department.name : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
                       {row.tglJatuhTempo ? row.tglJatuhTempo : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.pokokPenerimaan
-                        ? formatRupiah(row.pokokPenerimaan, "RP .")
+                      {row.principalReceipt
+                        ? formatRupiah(row.principalReceipt, "RP .")
                         : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.tglMasukRekeningPokok
-                        ? row.tglMasukRekeningPokok
+                      {row.principalReceiptEntryDate
+                        ? row.principalReceiptEntryDate
                         : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.keterangan ? row.keterangan : "-"}
+                      {row.description ? row.description : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
                       <Stack direction="row" spacing={1}>
