@@ -1,10 +1,6 @@
 import React from "react";
-import Header from "../components/Header";
+import Header from "../components/Header.jsx";
 import "../assets/css/customer.css";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -28,6 +24,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
+import { Alert, Button, Snackbar } from "@mui/material";
 const style = {
   position: "absolute",
   top: "50%",
@@ -44,22 +41,11 @@ const style = {
   fontFamily: "Poppins",
 };
 
-function SalesRevenuePage() {
+function ProductPage() {
   const navigate = useNavigate();
-  const ITEM_HEIGHT = 30;
-  const ITEM_PADDING_TOP = 8;
-  const MenuProps = {
-    PaperProps: {
-      style: {
-        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      },
-    },
-  };
 
-  const [departmentLists, setDepartmentLists] = React.useState([]);
   const [list, setList] = React.useState([]);
 
-  const [departmentId, setDepartmentId] = React.useState("");
   const [Search, setSearch] = React.useState("");
   const [deletedID, setDeletedID] = React.useState(null);
 
@@ -87,13 +73,6 @@ function SalesRevenuePage() {
     setPage(0);
   };
 
-  function getStyles() {
-    return {
-      fontSize: "0.7rem",
-      color: "grey",
-      fontFamily: "Poppins",
-    };
-  }
 
   function getStylesM() {
     return {
@@ -115,45 +94,35 @@ function SalesRevenuePage() {
     setOpenLoad(false);
     setOpen(true);
     axios
-      .delete(apis.server + `/sales-revenue/${id}`, {
+      .delete(apis.server + `/products/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
             }`,
         },
       })
       .then((res) => {
-        if(res.status===204){
+        console.log(res);
+        if (res.status === 204) {
           getList();
           setOpenLoad(false);
           setOpen(false);
-        }
+        } 
       })
       .catch((err) => {
+        if (err?.request?.status === 409) {
+          setAlertMessage("The data is currently in use and cannot be deleted. \n Please try again later or contact support for assistance.");
+          setOpenSnackBar(true);
+          setOpenLoad(false);
+          setOpen(false);
+        }
         console.log(err);
       });
   };
 
-  const fetchUnitData = () => {
-    axios
-      .get(apis.server + `/departments`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
-            }`,
-        },
-      })
-      .then((res) => {
-        setDepartmentLists(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
   const getList = () => {
     axios
-      .get(apis.server + "/sales-revenue/filter", {
+      .get(apis.server + "/products", {
         params: {
-          departmentId: departmentId ? departmentId : null,
           search: Search ? Search : null,
           page: page,
           size: rowsPerPage,
@@ -194,36 +163,43 @@ function SalesRevenuePage() {
   }));
 
 
-  /* Fungsi */
-  function formatRupiah(angka, prefix) {
-    var number_string = angka.replace(/[^,\d]/g, "").toString();
-    var split = number_string.split(",");
-    var sisa = split[0].length % 3;
-    var rupiah = split[0].substr(0, sisa);
-    var ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-    if (ribuan) {
-      var separator = sisa ? "." : "";
-      rupiah += separator + ribuan.join(".");
-    }
-
-    rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
-    return prefix === undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
-  }
-
 
   useEffect(() => {
     setOpenLoad(true)
     getList();
-    fetchUnitData();
     setOpenLoad(false)
-  }, [departmentId, Search, page, rowsPerPage]);
+  }, [Search, page, rowsPerPage]);
 
+
+  const [openSnackbar, setOpenSnackBar] = React.useState(false);
+
+  const [alert, setAlertMessage] = React.useState("");
+
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenSnackBar(false);
+  };
   return (
     <div>
+        <Snackbar open={openSnackbar} autoHideDuration={3000} onClose={handleClose} anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}>
+          <Alert
+            onClose={handleClose}
+            severity="warning"
+            sx={{ width: '100%' }}
+          >
+            {alert}
+          </Alert>
+        </Snackbar>
       <Header />
       <div className="right-content">
-        <div className="tittle-content">Invoice & Cash-In</div>
+        <div className="tittle-content">Product</div>
         <Modal
           open={open}
           // onClose={handleClose}
@@ -258,8 +234,8 @@ function SalesRevenuePage() {
               <div
                 className="btn-half"
                 onClick={() => {
-                    handleDelete(deletedID);
-                    setOpenLoad(false);
+                  handleDelete(deletedID);
+                  setOpenLoad(false);
                 }}
               >
                 OK
@@ -284,38 +260,7 @@ function SalesRevenuePage() {
             >
               <CircularProgress color="inherit" />
             </Backdrop>
-            {localStorage.bup === "ALL" ? (
-              <FormControl sx={{ m: 0, width: 200, mt: 0 }}>
-                <Select
-                  id="BUP"
-                  className="input-style"
-                  size="small"
-                  displayEmpty
-                  value={departmentLists.find((departement) => departement.id === departmentId)?.name}
-                  onChange={(e) => setDepartmentId(departmentLists.find((departement) => departement.name === e.target.value)?.id)}
-                  input={<OutlinedInput />}
-                  renderValue={(selected) => {
-                    if (selected) {
-                      return <label style={getStyles()}>{selected}</label>;
-                    }
-                    return <em style={getStyles()}>Unit</em>;
-                  }}
-                  MenuProps={MenuProps}
-                  inputProps={{ "aria-label": "Without label" }}
-                >
-                  <MenuItem key="1" value="" style={getStyles()}>
-                    <em>Pilih Unit</em>
-                  </MenuItem>
-                  {departmentLists.map((departement, index) => (
-                    <MenuItem key={departement.id} value={departement.name} id={departement.id} style={getStyles()}>
-                      {departement.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            ) : (
-              ""
-            )}
+
             <div className="search-bar  input-style">
               <input
                 type="search"
@@ -330,68 +275,8 @@ function SalesRevenuePage() {
             <div
               className="button-c"
               onClick={() => {
-                setOpenLoad(true);
-                const method = "GET";
-
-                const url = apis.server + "/sales-revenue/export";
-
-                axios
-
-                  .request({
-                    url,
-
-                    method,
-                    headers: {
-                      Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
-                        }`,
-                    },
-
-                    responseType: "blob", //important
-                  })
-
-                  .then(({ data }) => {
-                    const downloadUrl = window.URL.createObjectURL(
-                      new Blob([data])
-                    );
-
-                    const link = document.createElement("a");
-
-                    link.href = downloadUrl;
-                    const currentDate = new Date();
-
-                    const year = currentDate.getFullYear();
-                    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-                    const day = String(currentDate.getDate()).padStart(2, '0');
-                    const hours = String(currentDate.getHours()).padStart(2, '0');
-                    const minutes = String(currentDate.getMinutes()).padStart(2, '0');
-                    const seconds = String(currentDate.getSeconds()).padStart(2, '0');
-
-                    // Create the formatted timestamp
-                    const formattedTimestamp = `${year}${month}${day}${hours}${minutes}${seconds}`;
-
-                    // Create the static string with the timestamp
-                    const staticString = `sales_revenues_${formattedTimestamp}`;
-                    link.setAttribute("download", staticString + ".xlsx"); //any other extension
-
-                    document.body.appendChild(link);
-
-                    link.click();
-
-                    link.remove();
-                    setOpenLoad(false);
-                  });
-              }}
-            >
-              <div className="btn-padding">
-                <span className="material-icons-sharp">downloading</span>
-              </div>
-              <label style={{ color: "#718292" }}>Download Data</label>
-            </div>
-            <div
-              className="button-c"
-              onClick={() => {
                 if (create == 1) {
-                  navigate("/sales-revenue/add");
+                  navigate("/product/add");
                 } else {
                   navigate("/403");
                 }
@@ -409,25 +294,15 @@ function SalesRevenuePage() {
             <Table sx={{ minWidth: 700 }} aria-label="customized table">
               <TableHead>
                 <TableRow>
-                  <StyledTableCell>Company</StyledTableCell>
-                  <StyledTableCell align="center">Customer</StyledTableCell>
+                  <StyledTableCell align="center">Id</StyledTableCell>
                   <StyledTableCell align="center">
-                    Invoice Number
+                    Product
                   </StyledTableCell>
-                  <StyledTableCell align="center">Invoice Date</StyledTableCell>
+                  <StyledTableCell align="center">Company</StyledTableCell>
+                  <StyledTableCell align="center">Department Name</StyledTableCell>
                   <StyledTableCell align="center">
-                    Unit/Department
+                    Created Date
                   </StyledTableCell>
-                  <StyledTableCell align="center">
-                    Due Date
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    Principal Receipt (Rp)
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    Principal Payment Date
-                  </StyledTableCell>
-                  <StyledTableCell align="center">Notes</StyledTableCell>
                   <StyledTableCell align="center">Action</StyledTableCell>
                 </TableRow>
               </TableHead>
@@ -444,38 +319,30 @@ function SalesRevenuePage() {
 
                 {list.map((row) => (
                   <StyledTableRow key={row.id}>
-                    <StyledTableCell component="th" scope="row">
-                      {row.department.company.name ? row.department.company.name : "-"}
-                    </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.salesLeads.potentialCustomer ? row.salesLeads.potentialCustomer : "-"}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row.invoiceNumber ? row.invoiceNumber : "-"}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row.invoiceDate
-                        ? row.invoiceDate
+                      {row.id
+                        ? row.id
                         : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.department.name ? row.department.name : "-"}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row.dueDate ? row.dueDate : "-"}
-                    </StyledTableCell>
-                    <StyledTableCell align="center">
-                      {row.principalReceipt
-                        ? formatRupiah(row.principalReceipt, "RP .")
+                      {row.name
+                        ? row.name
                         : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.principalReceiptEntryDate
-                        ? row.principalReceiptEntryDate
+                      {row.department?.company?.name
+                        ? row.department?.company?.name
                         : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.notes ? row.notes : "-"}
+                      {row.department?.name
+                        ? row.department?.name
+                        : "-"}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      {row.createdAt
+                        ? row.createdAt
+                        : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
                       <Stack direction="row" spacing={1}>
@@ -483,7 +350,7 @@ function SalesRevenuePage() {
                           aria-label="delete"
                           color="error"
                           onClick={(_) => {
-                            if (deletePr == 1) {
+                            if (deletePr === 1) {
                               setOpen(true);
                               setModalTittle("Warning - Delete");
                               setModalMessage(
@@ -501,8 +368,8 @@ function SalesRevenuePage() {
                           aria-label="edit"
                           color="primary"
                           onClick={(_) => {
-                            if (update == 1) {
-                              navigate("/sales-revenue/edit", {
+                            if (update === 1) {
+                              navigate("/product/edit", {
                                 state: {
                                   sales: row,
                                 },
@@ -537,4 +404,4 @@ function SalesRevenuePage() {
   );
 }
 
-export default SalesRevenuePage;
+export default ProductPage;

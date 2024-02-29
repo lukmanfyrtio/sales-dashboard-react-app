@@ -7,12 +7,14 @@ import Logout from "@mui/icons-material/Logout";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import { IconButton, Divider } from "@mui/material";
 import { useAuthContext } from "@asgardeo/auth-react";
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
 import home from "../assets/images/home.png";
 import profpic from "../assets/images/user-default.png";
 import prospek from "../assets/images/prospek.png";
 import invoice from "../assets/images/invoice.png";
 import target from "../assets/images/target-ex.png";
+import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 
 import "../assets/css/header.css";
 
@@ -32,7 +34,9 @@ function Header() {
     { label: "Dashboard", icon: home, link: "/dashboard" },
     { label: "Leads", icon: prospek, link: "/sales-lead" },
     { label: "Revenue", icon: invoice, link: "/sales-revenue" },
-    { label: "Target & Existing", icon: target, link: "/company-target" }
+    { label: "Target & Existing", icon: target, link: "/company-target" },
+    { label: "Department", icon: <AccountTreeIcon sx={{ color: "white" }} />,mui:true, link: "/department" },
+    { label: "Product", icon: <DisplaySettingsIcon sx={{ color: "white" }} />,mui:true, link: "/product" }
   ]);
 
   const {
@@ -214,7 +218,8 @@ function Header() {
                       : ""
                   }
                 >
-                  <img src={val.icon} alt="" />
+                  {val.mui?val.icon:  <img src={val.icon} alt="" />}
+                
                   {val.label}
                 </li>
               );

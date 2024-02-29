@@ -313,10 +313,8 @@
 .btn-cancel {
   background: #ecf2ff;
   color: #576f9a;
-  width: 5rem;
   text-align: center;
-  height: 2.5rem;
-  padding-top: 10px;
+  padding: 10px;
   border-radius: 7px;
   margin-right: 10px;
   cursor: pointer;
@@ -325,10 +323,8 @@
 .btn-half {
   background: rgba(12, 117, 214, 0.13);
   color: #0c75d6;
-  width: 5rem;
   text-align: center;
-  height: 2.5rem;
-  padding-top: 10px;
+  padding: 10px;
   border-radius: 7px;
   margin-right: 10px;
   cursor: pointer;
@@ -337,10 +333,18 @@
 .btn-half-cancel {
   background: rgba(12, 117, 214, 0.13);
   color: #d32f2f;
-  width: 5rem;
   text-align: center;
-  height: 2.5rem;
-  padding-top: 10px;
+  padding: 10px;
+  border-radius: 7px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.btn-download {
+  background: rgba(12, 117, 214, 0.13);
+  color: #0c75d6;
+  text-align: center;
+  padding: 10px;
   border-radius: 7px;
   margin-right: 10px;
   cursor: pointer;

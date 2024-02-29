@@ -14,6 +14,8 @@ import SalesLeadsForm from './pages/SalesLeadsForm.jsx';
 import SalesRevenueForm from './pages/SalesRevenueForm.jsx';
 import CompanyTargetForm from './pages/CompanyTargetForm.jsx';
 import SalesLeadsUploadForm from './pages/SalesLeadsUploadForm.jsx';
+import DepartmentPage from './pages/DepartmentPage.jsx';
+import ProductPage from './pages/ProductPage.jsx';
 
 
 
@@ -48,6 +50,11 @@ function App() {
               <Route exact path="/company-target" element={<CompanyTargetPage />} />
               <Route exact path="/company-target/add" element={<CompanyTargetForm />} />
               <Route exact path="/company-target/edit" element={<CompanyTargetForm />} />
+
+
+              <Route exact path="/department" element={<DepartmentPage />} />
+              <Route exact path="/product" element={<ProductPage />} />
+
               <Route exact path="/login" element={<SuccessLogin />} />
             </>
             : <>

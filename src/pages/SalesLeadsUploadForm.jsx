@@ -90,6 +90,36 @@ function SalesLeadsUploadForm() {
     },
   }));
 
+  const handleDownload = () => {
+    // Make a request to the Spring Boot API endpoint using Axios
+    axios({
+      method: 'get',
+      url: apis.server + "/salesleads/sample",
+      headers: {
+        Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+          }`,
+      },
+      responseType: 'blob',
+    })
+      .then(response => {
+        // Create a link element to trigger the download
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'sales_leads_sample_data.xlsx');
+
+        // Append the link to the document and trigger the download
+        document.body.appendChild(link);
+        link.click();
+
+        // Remove the link from the document
+        document.body.removeChild(link);
+      })
+      .catch(error => {
+        console.error('Error downloading file:', error);
+      });
+  };
+
 
 
   return (
@@ -139,9 +169,15 @@ function SalesLeadsUploadForm() {
               Reset
             </div>
             <div
+              className="btn-download"
+              onClick={handleDownload}
+            >
+              Download template file
+            </div>
+            <div
               className="btn-half"
               onClick={() => {
-                if(!file){
+                if (!file) {
                   setAlertMessage("Please upload file first.")
                   return;
                 }

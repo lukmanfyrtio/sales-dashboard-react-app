@@ -622,7 +622,7 @@ function SalesLeadsPage() {
                               setOpen(true);
                               setModalTittle("Warning - Delete");
                               setModalMessage(
-                                "Apakah anda yakin ingin menghapus data ?"
+                               "Are you sure you want to delete the data?"
                               );
                               setDeletedID(row.id);
                             } else {
