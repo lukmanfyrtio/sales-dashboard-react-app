@@ -207,8 +207,8 @@ function SalesRevenuePage() {
       rupiah += separator + ribuan.join(".");
     }
 
-    rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
-    return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
+    rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
+    return prefix === undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
   }
 
 
@@ -333,7 +333,7 @@ function SalesRevenuePage() {
                 setOpenLoad(true);
                 const method = "GET";
 
-                const url = apis.server + "/invoice/download";
+                const url = apis.server + "/sales-revenue/export";
 
                 axios
 
@@ -370,7 +370,7 @@ function SalesRevenuePage() {
                     const formattedTimestamp = `${year}${month}${day}${hours}${minutes}${seconds}`;
 
                     // Create the static string with the timestamp
-                    const staticString = `Sales_${formattedTimestamp}`;
+                    const staticString = `sales_revenues_${formattedTimestamp}`;
                     link.setAttribute("download", staticString + ".xlsx"); //any other extension
 
                     document.body.appendChild(link);
@@ -391,7 +391,7 @@ function SalesRevenuePage() {
               className="button-c"
               onClick={() => {
                 if (create == 1) {
-                  navigate("/sales/add");
+                  navigate("/sales-revenue/add");
                 } else {
                   navigate("/403");
                 }
@@ -462,7 +462,7 @@ function SalesRevenuePage() {
                       {row.department.name ? row.department.name : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.tglJatuhTempo ? row.tglJatuhTempo : "-"}
+                      {row.dueDate ? row.dueDate : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
                       {row.principalReceipt
@@ -475,7 +475,7 @@ function SalesRevenuePage() {
                         : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.description ? row.description : "-"}
+                      {row.notes ? row.notes : "-"}
                     </StyledTableCell>
                     <StyledTableCell align="center">
                       <Stack direction="row" spacing={1}>
@@ -502,7 +502,7 @@ function SalesRevenuePage() {
                           color="primary"
                           onClick={(_) => {
                             if (update == 1) {
-                              navigate("/sales/edit", {
+                              navigate("/sales-revenue/edit", {
                                 state: {
                                   sales: row,
                                 },

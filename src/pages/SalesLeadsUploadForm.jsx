@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef } from "react";
-import Header from "../components/Header";
+import Header from "../components/Header.jsx";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
@@ -18,12 +18,15 @@ import RemoveDoneIcon from "@mui/icons-material/RemoveDone";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import apis from "../apis.js"
+import { Alert } from "@mui/material";
+import { set } from "date-fns";
 
-function CustomerUpload() {
+function SalesLeadsUploadForm() {
   const [file, setFile] = React.useState(null);
   const [dataExcel, setDataExcel] = React.useState([]);
 
   const [openLoad, setOpenLoad] = React.useState(false);
+  const [alert, setAlertMessage] = React.useState(null);
 
   const activeStyle = {
     borderColor: "#2196f3",
@@ -87,70 +90,7 @@ function CustomerUpload() {
     },
   }));
 
-  function createData(
-    BUP,
-    namaSales,
-    calonPelanggan,
-    area,
-    produk,
-    leadsCategory,
-    stage,
-    status
-  ) {
-    return {
-      BUP,
-      namaSales,
-      calonPelanggan,
-      area,
-      produk,
-      leadsCategory,
-      stage,
-      status,
-    };
-  }
 
-  const rows = [
-    createData(
-      "SWAMEDIA",
-      "Jenny",
-      "PT REJO MULYO SOLUTION",
-      "PAPUA",
-      "Capacity",
-      "High",
-      "Proposal",
-      "Open"
-    ),
-    createData(
-      "SWAMEDIA",
-      "Jenny",
-      "PT REJO MULYO SOLUTION",
-      "PAPUA",
-      "Capacity",
-      "High",
-      "Proposal",
-      "Open"
-    ),
-    createData(
-      "SWAMEDIA",
-      "Jenny",
-      "PT REJO MULYO SOLUTION",
-      "PAPUA",
-      "Capacity",
-      "High",
-      "Proposal",
-      "Open"
-    ),
-    createData(
-      "SWAMEDIA",
-      "Jenny",
-      "PT REJO MULYO SOLUTION",
-      "PAPUA",
-      "Capacity",
-      "High",
-      "Proposal",
-      "Open"
-    ),
-  ];
 
   return (
     <div>
@@ -159,7 +99,7 @@ function CustomerUpload() {
         <div className="tittle-content">
           <ArrowBackIcon
             className="back-arrow"
-            onClick={() => navigate("/customer")}
+            onClick={() => navigate("/sales-lead")}
           />{" "}
           <label>Upload Data Prospect/Leads</label>
         </div>
@@ -187,6 +127,7 @@ function CustomerUpload() {
               </>
             )}
           </div>
+          {alert !== null ? <Alert severity="error">{alert}</Alert> : ""}
           <div className="submit-form">
             <div
               className="btn-cancel"
@@ -200,19 +141,24 @@ function CustomerUpload() {
             <div
               className="btn-half"
               onClick={() => {
+                if(!file){
+                  setAlertMessage("Please upload file first.")
+                  return;
+                }
+                setAlertMessage(null);
+
                 setOpenLoad(true);
                 var formData = new FormData();
                 formData.append("file", file);
                 axios
                   .post(
-                    apis.server+"/dashboard/upload/excel2",
+                    apis.server + "/salesleads/import",
                     formData,
                     {
                       headers: {
                         "Content-Type": "multipart/form-data",
-                        Authorization: `Bearer ${
-                          localStorage.token ? localStorage.token : ""
-                        }`,
+                        Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+                          }`,
                       },
                     }
                   )
@@ -241,17 +187,16 @@ function CustomerUpload() {
               <Table sx={{ minWidth: 700 }} aria-label="customized table">
                 <TableHead>
                   <TableRow>
-                    <StyledTableCell>Company</StyledTableCell>
-                    <StyledTableCell align="center">Nama Sales</StyledTableCell>
+                    <StyledTableCell>Month</StyledTableCell>
+                    <StyledTableCell align="center">Sales Name</StyledTableCell>
                     <StyledTableCell align="center">
-                      Calon Pelanggan
+                      Potential Customer
                     </StyledTableCell>
-                    <StyledTableCell align="center">Project</StyledTableCell>
                     <StyledTableCell align="center">Product</StyledTableCell>
+                    <StyledTableCell align="center"> Current Stage</StyledTableCell>
                     <StyledTableCell align="center">
-                      Current Stage
+                      Leads Status
                     </StyledTableCell>
-                    <StyledTableCell align="center">Status</StyledTableCell>
                     <StyledTableCell align="center">Keterangan</StyledTableCell>
                     <StyledTableCell align="center">Validation</StyledTableCell>
                     <StyledTableCell align="center">
@@ -261,47 +206,30 @@ function CustomerUpload() {
                 </TableHead>
                 <TableBody>
                   {dataExcel.map((row) => (
-                    <StyledTableRow key={row.name}>
+                    <StyledTableRow key={row.salesLeads.id}>
                       <StyledTableCell component="th" scope="row">
-                        {row.customerInfo.bup ? row.customerInfo.bup : "-"}
+                        {row.salesLeads.month ? row.salesLeads.month : "-"}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {row.customerInfo.salesName
-                          ? row.customerInfo.salesName
-                          : "-"}
+                        {row.salesLeads.salesName ? row.salesLeads.salesName : "-"}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {row.customerInfo.calonPelanggan
-                          ? row.customerInfo.calonPelanggan
-                          : "-"}
+                        {row.salesLeads.potentialCustomer ? row.salesLeads.potentialCustomer : "-"}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {row.customerInfo.project
-                          ? row.customerInfo.project
-                          : "-"}
+                        {row.salesLeads.product?.name ? row.salesLeads.product?.name : "-"}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {row.customerInfo.produk
-                          ? row.customerInfo.produk
-                          : "-"}
+                        {row.salesLeads.currentStage ? row.salesLeads.currentStage : "-"}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {row.customerInfo.currentStage
-                          ? row.customerInfo.currentStage
-                          : "-"}
+                        {row.salesLeads.leadsStatus ? row.salesLeads.leadsStatus : "-"}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {row.customerInfo.leadsStatus
-                          ? row.customerInfo.leadsStatus
-                          : "-"}
+                        {row.salesLeads.keterangan ? row.salesLeads.notes : "-"}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {row.customerInfo.keterangan
-                          ? row.customerInfo.keterangan
-                          : "-"}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {row.valid == true ? (
+                        {row.valid ? (
                           <DoneIcon style={{ color: "green" }} />
                         ) : (
                           <RemoveDoneIcon style={{ color: "red" }} />
@@ -324,4 +252,4 @@ function CustomerUpload() {
   );
 }
 
-export default CustomerUpload;
+export default SalesLeadsUploadForm;

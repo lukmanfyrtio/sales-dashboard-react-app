@@ -6,13 +6,14 @@ import AdminDashboard from './pages/AdminDashboard';
 import SuccessLogin from './pages/SuccessLogin.jsx';
 import { useAuthContext } from '@asgardeo/auth-react';
 import DetailDashboard from './pages/DetailDashboard.jsx';
-import CustomerAdd from './pages/CustomerAdd.jsx';
-import CustomerUpload from './pages/CustomerUpload.jsx';
-import SalesInfoAdd from './pages/SalesInfoAdd.jsx';
-import SalesTargetAdd from './pages/SalesTargetAdd.jsx';
+import CustomerUpload from './pages/SalesLeadsUploadForm.jsx';
 import SalesLeadsPage from './pages/SalesLeadsPage.jsx';
 import SalesRevenuePage from './pages/SalesRevenuePage.jsx';
 import CompanyTargetPage from './pages/CompanyTargetPage.jsx';
+import SalesLeadsForm from './pages/SalesLeadsForm.jsx';
+import SalesRevenueForm from './pages/SalesRevenueForm.jsx';
+import CompanyTargetForm from './pages/CompanyTargetForm.jsx';
+import SalesLeadsUploadForm from './pages/SalesLeadsUploadForm.jsx';
 
 
 
@@ -35,17 +36,18 @@ function App() {
               <Route exact path="/dashboard/detail" element={<DetailDashboard />} />
 
               <Route exact path="/sales-lead" element={<SalesLeadsPage />} />
-              <Route exact path="/customer/add" element={<CustomerAdd />} />
-              <Route exact path="/customer/edit" element={<CustomerAdd />} />
-              <Route exact path="/customer/upload" element={<CustomerUpload />} />
+              <Route exact path="/sales-lead/add" element={<SalesLeadsForm />} />
+              <Route exact path="/sales-lead/edit" element={<SalesLeadsForm />} />
+              
+              <Route exact path="/sales-lead/upload" element={<SalesLeadsUploadForm />} />
 
               <Route exact path="/sales-revenue" element={<SalesRevenuePage />} />
-              <Route exact path="/sales/add" element={<SalesInfoAdd />} />
-              <Route exact path="/sales/edit" element={<SalesInfoAdd />} />
+              <Route exact path="/sales-revenue/add" element={<SalesRevenueForm />} />
+              <Route exact path="/sales-revenue/edit" element={<SalesRevenueForm />} />
               
               <Route exact path="/company-target" element={<CompanyTargetPage />} />
-              <Route exact path="/sales-target/add" element={<SalesTargetAdd />} />
-              <Route exact path="/sales-target/edit" element={<SalesTargetAdd />} />
+              <Route exact path="/company-target/add" element={<CompanyTargetForm />} />
+              <Route exact path="/company-target/edit" element={<CompanyTargetForm />} />
               <Route exact path="/login" element={<SuccessLogin />} />
             </>
             : <>

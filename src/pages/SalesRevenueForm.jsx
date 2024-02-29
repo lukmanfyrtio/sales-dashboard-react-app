@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import Header from "../components/Header";
+import React, { useEffect, useState } from "react";
+import Header from "../components/Header.jsx";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useLocation, useNavigate } from "react-router-dom";
 import OutlinedInput from "@mui/material/OutlinedInput";
@@ -18,9 +18,10 @@ import axios from "axios";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-import moment from "moment";
 
 import apis from "../apis.js";
+import { Alert } from "@mui/material";
+import moment from "moment/moment.js";
 
 const style = {
   position: "absolute",
@@ -38,19 +39,36 @@ const style = {
   fontFamily: "Poppins",
 };
 
-function SalesInfoAdd(props) {
-  const navigate = useNavigate();
+const initialSalesRevenueState = {
+  id: '',
+  invoiceNumber: '',
+  invoiceDate: null,
+  dueDate: null,
+  principalReceipt: '',
+  principalReceiptEntryDate: null,
+  notes: '',
+  // dueDateStatus: '',
+  // agingSinceReceived: '',
+  // penalty: '',
+  // agingInvoiceDescription: '',
+  // paymentAging: '',
+  department: null,
+  salesLeads: null,
+};
 
-  //set select
-  const ITEM_HEIGHT = 30;
-  const ITEM_PADDING_TOP = 8;
-  const MenuProps = {
-    PaperProps: {
-      style: {
-        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      },
+const ITEM_HEIGHT = 30;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
     },
-  };
+  },
+};
+
+function SalesRevenueForm(props) {
+  const navigate = useNavigate();
+  const { state } = useLocation();
 
   function getStyles() {
     return {
@@ -76,8 +94,6 @@ function SalesInfoAdd(props) {
     };
   }
 
-  const BUPLists = localStorage.bup === "ALL" ? ["SWAMEDIA", "MOTIO", "SWADAMA"] : [localStorage.bup];
-
   const [modalMessage, setModalMessage] = React.useState(
     "Data berhasil disimpan"
   );
@@ -85,69 +101,96 @@ function SalesInfoAdd(props) {
   const [open, setOpen] = React.useState(false);
   const [modalTittle, setModalTittle] = React.useState("Information");
 
-  
-  const [id, setId] = React.useState();
-  const [customers, setCustomers] = React.useState([]);
-  const [BUP, setBup] = React.useState("");
-  const [tglMasukRekeningPokok, setTglMasukRekeningPokok] = React.useState(null);
-  const [tglInvoiceDiterimaTenant, setTglInvoiceDiterimaTenant] = React.useState(null);
-  const [tglJatuhTempo, setTglJatuhTempo] = React.useState(null);
-  const [tglInvoice, setTglInvoice] = React.useState(null);
-  const [keterangan, setKeterangan] = React.useState("");
-  const [noInvoice, setNoInvoice] = React.useState("");
-  const [pokokPenerimaan, setPokokPenerimaan] = React.useState("");
-  const [tenant, setTenant] = React.useState();
+  const [alert, setAlertMessage] = React.useState(null);
 
-  const { state } = useLocation();
+  const [salesRevenue, setSalesRevenue] = useState(initialSalesRevenueState);
+  const [departmentLists, setDepartmentLists] = React.useState([]);
+  const [departmentId, setDepartmentId] = React.useState("");
+  const [departmentName, setDepartmentName] = React.useState("");
+
+  const [salesLeadLists, setSalesLeadLists] = React.useState([]);
+  const [salesLeadsId, setSalesLeadsId] = React.useState("");
+  const [salesLeadsName, setSalesLeadsName] = React.useState("");
+
+  const resetSalesRevenue = () => {
+    setSalesRevenue(initialSalesRevenueState);
+  };
+
+  const updateDepartment = (departement) => {
+    setSalesRevenue((prevSalesRevenue) => ({
+      ...prevSalesRevenue,
+      department: departement,
+    }));
+  };
+
+  const updateSalesLeads = (salesLeads) => {
+    setSalesRevenue((prevSalesRevenue) => ({
+      ...prevSalesRevenue,
+      salesLeads: salesLeads
+    }));
+  };
+
+  const setKeyValue = (key, value) => {
+    setSalesRevenue((prevState) => ({
+      ...prevState,
+      [key]:  value instanceof Date ? moment(value).format('YYYY/MM/DD') : value
+    }));
+  };
+
+  const fetchUnitData = () => {
+    axios
+      .get(apis.server + `/departments`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
+        },
+      })
+      .then((res) => {
+        setDepartmentLists(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  const fetchLeads = () => {
+    axios
+      .get(apis.server + `/salesleads`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
+        },
+      })
+      .then((res) => {
+        setSalesLeadLists(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   useEffect(() => {
-    axios.get(apis.server + "/dashboard/customers", {
-      headers: {
-        Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
-          }`,
-      },
-    })
-    .then((res) => {
-      setCustomers(res.data.data);
-    })
-    .catch((err) => {
-      console.error({ err });
-    });
+    fetchLeads();
+    fetchUnitData();
     if (state?.sales) {
-      const sales = state.sales;
+      console.log(state.sales);
       setIsEdit(true);
-      setId(sales.id);
-      setBup(sales.bup);
-      setTenant(sales.tenant);
-      setTglMasukRekeningPokok(
-        sales.tglMasukRekeningPokok
-          ? moment(sales.tglMasukRekeningPokok, "DD/MM/YYYY").toDate()
-          : null
-      );
-
-      setNoInvoice(sales.nomerInvoice);
-      setTglInvoice(
-        sales.tglInvoice
-          ? moment(sales.tglInvoice, "DD/MM/YYYY").toDate()
-          : null
-      );
-      setTglInvoiceDiterimaTenant(
-        sales.tglInvoiceDiterimaTenant
-          ? moment(sales.tglInvoiceDiterimaTenant, "DD/MM/YYYY").toDate()
-          : null
-      );
-      setTglJatuhTempo(sales.tglJatuhTempo
-        ? moment(sales.tglJatuhTempo, "DD/MM/YYYY").toDate()
-        : null);
-      setPokokPenerimaan(sales.pokokPenerimaan);
-      setTglMasukRekeningPokok(sales.tglMasukRekeningPokok
-        ? moment(sales.tglMasukRekeningPokok, "DD/MM/YYYY").toDate()
-        : null);
-      setKeterangan(sales.keterangan);
+      const salesRevenue = state.sales;
+      setSalesRevenue(salesRevenue);
+      setSalesLeadsId(salesRevenue?.id)
+      setSalesLeadsName(salesRevenue?.salesLeads?.potentialCustomer+"@"+salesRevenue?.salesLeads?.id);
+      setDepartmentId(salesRevenue?.department?.id);
+      setDepartmentName(salesRevenue?.department?.name);
+      updateDepartment(salesRevenue?.department);
+      updateSalesLeads(salesRevenue?.salesLeads);
     } else {
       setIsEdit(false);
     }
   }, []);
 
+  useEffect(() => {
+    console.log(salesRevenue);
+  }, [salesRevenue]);
   /* Fungsi */
   function formatRupiah(angka, prefix) {
     var number_string = angka.replace(/[^,\d]/g, "").toString();
@@ -161,37 +204,34 @@ function SalesInfoAdd(props) {
       rupiah += separator + ribuan.join(".");
     }
 
-    rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
-    return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
+    rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
+    return prefix === undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
   }
 
   function submitData() {
-    axios({
-      method: "post",
-      url: `${isEdit
-        ? `${apis.server}/invoice/edit/${id}`
-        : apis.server + "/invoice/add"
-        }`,
-      data: {
-        bup: BUP,
-        tenant: tenant,
-        nomerInvoice: noInvoice,
-        tglInvoice: tglInvoice
-          ? moment(new Date(tglInvoice)).format("DD/MM/YYYY")
-          : "",
-        tglInvoiceDiterimaTenant: tglInvoiceDiterimaTenant
-          ? moment(new Date(tglInvoiceDiterimaTenant)).format("DD/MM/YYYY")
-          : "",
 
-        tglJatuhTempo: tglJatuhTempo
-          ? moment(new Date(tglJatuhTempo)).format("DD/MM/YYYY")
-          : "",
-        pokokPenerimaan: pokokPenerimaan.replace(/^\Rp. /, "").replace(/\./g, ""),
-        tglMasukRekeningPokok: tglMasukRekeningPokok
-          ? moment(new Date(tglMasukRekeningPokok)).format("DD/MM/YYYY")
-          : "",
-        keterangan: keterangan,
-      },
+    if (
+      salesRevenue.invoiceNumber === '' ||
+      salesRevenue.invoiceDate === null ||
+      salesRevenue.dueDate === null ||
+      salesRevenue.principalReceipt === '' ||
+      salesRevenue.principalReceiptEntryDate === null ||
+      salesRevenue.salesLeads === null
+    ) {
+      setAlertMessage("Please fill in all required fields");
+      return;
+    }
+
+    axios({
+      method: `${isEdit
+        ? `put`
+        : "post"
+        }`,
+      url: `${isEdit
+        ? `${apis.server}/sales-revenue/${salesRevenue.id}`
+        : apis.server + "/sales-revenue"
+        }`,
+      data: salesRevenue,
       headers: {
         Authorization: `Bearer ${localStorage.token ? localStorage.token : ""}`,
       },
@@ -218,7 +258,7 @@ function SalesInfoAdd(props) {
         <div className="tittle-content">
           <ArrowBackIcon
             className="back-arrow"
-            onClick={() => navigate("/sales")}
+            onClick={() => navigate("/sales-revenue")}
           />{" "}
           <label>{isEdit ? "Edit" : "Add"} Invoice & Cash-In</label>
         </div>
@@ -259,7 +299,7 @@ function SalesInfoAdd(props) {
                   onClick={() => {
                     modalTittle === "Warning"
                       ? setOpen(false)
-                      : navigate("/sales");
+                      : navigate("/sales-revenue");
                   }}
                 >
                   OK
@@ -270,28 +310,23 @@ function SalesInfoAdd(props) {
           <div className="row-form">
             <div className="row-left">
               <div className="column-form">
-                {id ? (
-                  <div className="input-i">
-                    <label>ID Sales</label>
-                    <div>
-                      <label>{id}</label>
-                    </div>
-                  </div>
-                ) : (
-                  ""
-                )}
 
                 <div className="input-i">
-                  <label>Company</label>
-                  <div>
-                    <FormControl sx={{ m: 0, width: 200, mt: 0 }}>
+                  <label>Unit/Department</label>
+                  <div className="input-i-txt">
+                    <FormControl fullWidth>
                       <Select
-                        id="BUP"
-                        className="input-style"
+                        disabled
+                        id="departement"
+                        // className="input-style"
+                        value={departmentName}
+                        onChange={(e) => {
+                          const found = departmentLists.find((departement) => departement.name === e.target.value);
+                          setDepartmentId(found?.id)
+                          setDepartmentName(found?.name);
+                        }}
                         size="small"
                         displayEmpty
-                        value={BUP}
-                        onChange={(e) => setBup(e.target.value)}
                         input={<OutlinedInput />}
                         renderValue={(selected) => {
                           if (selected) {
@@ -299,35 +334,56 @@ function SalesInfoAdd(props) {
                               <label style={getStyles()}>{selected}</label>
                             );
                           }
-                          return <em style={getStyles()}>Pilih</em>;
+                          return <em style={getStyles()}>-</em>;
                         }}
                         MenuProps={MenuProps}
                         inputProps={{ "aria-label": "Without label" }}
                       >
-                        <MenuItem key="BUP" value="BUP" style={getStyles()}>
-                          <em>Pilih Company</em>
+                        <MenuItem key="1" value="" style={getStyles()}>
+                          <em>Pilih Unit</em>
                         </MenuItem>
-                        {BUPLists.map((name) => (
-                          <MenuItem key={name} value={name} style={getStyles()}>
-                            {name}
+                        {departmentLists.map((departement, index) => (
+                          <MenuItem key={departement.id} value={departement.name} id={departement.id} style={getStyles()}>
+                            {departement.name}
                           </MenuItem>
                         ))}
                       </Select>
+
                     </FormControl>
+                    <label
+                      style={{
+                        marginLeft: "1rem",
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
+                        alignSelf: "center",
+                      }}
+                    >
+                      *
+                    </label>
                   </div>
                 </div>
 
                 <div className="input-i">
-                  <label>Customer</label>
+                  <label>Leads</label>
                   <div>
                     <FormControl sx={{ m: 0, width: 200, mt: 0 }}>
                       <Select
-                        id="Tenant"
+                        id="sales-leads"
                         className="input-style"
                         size="small"
                         displayEmpty
-                        value={tenant}
-                        onChange={(e) => setTenant(e.target.value)}
+                        value={salesLeadsName.split("@")[0]}
+                        onChange={(e) => {
+                          console.log(e.target);
+                          console.log(e.dataset);
+                          const found = salesLeadLists.find((leads) => leads.potentialCustomer+"@"+leads.id === e.target.value);
+                          setSalesLeadsId(found?.id)
+                          setSalesLeadsName(found?.potentialCustomer+"@"+found?.id);
+                          setDepartmentId(found?.product?.department?.id);
+                          setDepartmentName(found?.product?.department?.name)
+                          updateSalesLeads(found);
+                          updateDepartment(found?.product?.department);
+                        }}
                         input={<OutlinedInput />}
                         renderValue={(selected) => {
                           if (selected) {
@@ -341,11 +397,11 @@ function SalesInfoAdd(props) {
                         inputProps={{ "aria-label": "Without label" }}
                       >
                         <MenuItem key="BUP" value="BUP" style={getStyles()}>
-                          <em>Pilih Customer</em>
+                          <em>Pilih Sales Leads</em>
                         </MenuItem>
-                        {customers.map((name) => (
-                          <MenuItem key={name} value={name} style={getStyles()}>
-                            {name}
+                        {salesLeadLists.map((lead) => (
+                          <MenuItem key={lead.id} data-value="250" value={lead.potentialCustomer+"@"+lead.id} name="koyo" style={getStyles()}>
+                            {lead.potentialCustomer}
                           </MenuItem>
                         ))}
                       </Select>
@@ -355,10 +411,22 @@ function SalesInfoAdd(props) {
 
                 <div className="input-i">
                   <label>Invoice Number </label>
-                  <input
-                    onChange={(e) => setNoInvoice(e.target.value)}
-                    value={noInvoice}
-                  ></input>
+                  <div className="input-i-txt">
+                    <input
+                      onChange={(e) => setKeyValue('invoiceNumber', e.target.value)}
+                      value={salesRevenue.invoiceNumber}
+                    ></input>
+                    <label
+                      style={{
+                        marginLeft: "1rem",
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
+                        alignSelf: "center",
+                      }}
+                    >
+                      *
+                    </label>
+                  </div>
                 </div>
 
                 <div className="input-i">
@@ -371,10 +439,8 @@ function SalesInfoAdd(props) {
                           format="dd/MM/yyyy"
                           openTo="day"
                           views={["year", "month", "day"]}
-                          value={tglInvoice}
-                          onChange={(newValue) => {
-                            setTglInvoice(newValue);
-                          }}
+                          value={salesRevenue.invoiceDate}
+                          onChange={(e) => setKeyValue('invoiceDate', e)}
                           renderInput={(params) => (
                             <TextField
                               inputProps={{ style: { fontSize: "5rem" } }}
@@ -385,33 +451,16 @@ function SalesInfoAdd(props) {
                         />
                       </Stack>
                     </LocalizationProvider>
-                  </div>
-                </div>
-
-                <div className="input-i">
-                  <label>Customer's Invoice Received Date</label>
-                  <div>
-                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                      <Stack>
-                        <DatePicker
-                          inputFormat="dd/MM/yyyy"
-                          format="dd/MM/yyyy"
-                          openTo="day"
-                          views={["year", "month", "day"]}
-                          value={tglInvoiceDiterimaTenant}
-                          onChange={(newValue) => {
-                            setTglInvoiceDiterimaTenant(newValue);
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              inputProps={{ style: { fontSize: "5rem" } }}
-                              size="small"
-                              {...params}
-                            />
-                          )}
-                        />
-                      </Stack>
-                    </LocalizationProvider>
+                    <label
+                      style={{
+                        marginLeft: "1rem",
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
+                        alignSelf: "center",
+                      }}
+                    >
+                      *
+                    </label>
                   </div>
                 </div>
 
@@ -425,10 +474,8 @@ function SalesInfoAdd(props) {
                           format="dd/MM/yyyy"
                           openTo="day"
                           views={["year", "month", "day"]}
-                          value={tglJatuhTempo}
-                          onChange={(newValue) => {
-                            setTglJatuhTempo(newValue);
-                          }}
+                          value={salesRevenue?.dueDate}
+                          onChange={(e) => setKeyValue('dueDate', e)}
                           renderInput={(params) => (
                             <TextField
                               inputProps={{ style: { fontSize: "5rem" } }}
@@ -439,6 +486,16 @@ function SalesInfoAdd(props) {
                         />
                       </Stack>
                     </LocalizationProvider>
+                    <label
+                      style={{
+                        marginLeft: "1rem",
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
+                        alignSelf: "center",
+                      }}
+                    >
+                      *
+                    </label>
                   </div>
                 </div>
               </div>
@@ -448,11 +505,23 @@ function SalesInfoAdd(props) {
 
                 <div className="input-i">
                   <label>Principal Receipt (Rp)</label>
-                  <input
-                    // type="number"
-                    onChange={(e) => setPokokPenerimaan(e.target.value)}
-                    value={formatRupiah(pokokPenerimaan ? pokokPenerimaan : "", "RP. ")}
-                  ></input>
+                  <div className="input-i-txt">
+                    <input
+                      // type="number"
+                      onChange={(e) => setKeyValue('principalReceipt', e.target.value)}
+                      value={formatRupiah(salesRevenue.principalReceipt ? salesRevenue.principalReceipt : "", "RP. ")}
+                    ></input>
+                    <label
+                      style={{
+                        marginLeft: "1rem",
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
+                        alignSelf: "center",
+                      }}
+                    >
+                      *
+                    </label>
+                  </div>
                 </div>
 
                 <div className="input-i">
@@ -465,10 +534,8 @@ function SalesInfoAdd(props) {
                           format="dd/MM/yyyy"
                           openTo="day"
                           views={["year", "month", "day"]}
-                          value={tglMasukRekeningPokok}
-                          onChange={(newValue) => {
-                            setTglMasukRekeningPokok(newValue);
-                          }}
+                          value={salesRevenue.principalReceiptEntryDate}
+                          onChange={(e) => setKeyValue('principalReceiptEntryDate', e)}
                           renderInput={(params) => (
                             <TextField
                               inputProps={{ style: { fontSize: "5rem" } }}
@@ -479,6 +546,16 @@ function SalesInfoAdd(props) {
                         />
                       </Stack>
                     </LocalizationProvider>
+                    <label
+                      style={{
+                        marginLeft: "1rem",
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
+                        alignSelf: "center",
+                      }}
+                    >
+                      *
+                    </label>
                   </div>
                 </div>
 
@@ -489,8 +566,8 @@ function SalesInfoAdd(props) {
                       aria-label="minimum height"
                       minRows={8}
                       className="text-area-s"
-                      value={keterangan}
-                      onChange={(e) => setKeterangan(e.target.value)}
+                      value={salesRevenue.notes}
+                      onChange={(e) => setKeyValue('notes', e.target.value)}
                     />
                   </div>
                 </div>
@@ -498,8 +575,9 @@ function SalesInfoAdd(props) {
               </div>
             </div>
           </div>
+          {alert !== null ? <Alert severity="error">{alert}</Alert> : ""}
           <div className="submit-form">
-            <div className="btn-cancel">Reset</div>
+            <div className="btn-cancel" onClick={() => resetSalesRevenue()}>Reset</div>
             <div className="btn-half" onClick={() => submitData()}>
               Save
             </div>
@@ -510,4 +588,4 @@ function SalesInfoAdd(props) {
   );
 }
 
-export default SalesInfoAdd;
+export default SalesRevenueForm;

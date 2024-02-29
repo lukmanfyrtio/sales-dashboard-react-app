@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import Header from "../components/Header";
+import Header from "../components/Header.jsx";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useLocation, useNavigate } from "react-router-dom";
 import OutlinedInput from "@mui/material/OutlinedInput";
@@ -38,7 +38,7 @@ const style = {
   fontFamily: "Poppins",
 };
 
-function CustomerAdd(props) {
+function SalesLeadsForm(props) {
 
   const navigate = useNavigate();
 
@@ -52,50 +52,6 @@ function CustomerAdd(props) {
       },
     },
   };
-
-  //option list
-  const BUPLists = localStorage.bup==="ALL"?["SWAMEDIA", "MOTIO", "SWADAMA"]:[localStorage.bup];
-  const statusList = ["Open", "Close"];
-
-
-  var months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  var productList = ["Loccana", "WSO2", "Ordera","Bonefire","APICentrum"];
-  var leadsCategoryList = ["High", "Medium", "Low"];
-  var projectList = [
-    "P1",
-    "P2",
-    "P3",
-    "P4",
-    "P5",
-    "P6",
-    "P7",
-    "P8A",
-    "P8B",
-    "P9",
-    "P10",
-    "P11",
-    "P12",
-    "P13",
-    "P14",
-    "P15A",
-    "P15B",
-    "P16",
-    "P17",
-  ];
 
   function getStyles() {
     return {
@@ -120,251 +76,183 @@ function CustomerAdd(props) {
       fontFamily: "Poppins",
     };
   }
-  const [isEdit, setIsEdit] = React.useState(false);
-  const { state } = useLocation();
-  useEffect(() => {
-    if (state?.customer) {
-      setIsEdit(true);
-      const { customer } = state;
-      setMonth(customer.bulan);
-      setBUP(customer.bup);
-      setNamaSales(customer.salesName);
-      setCalonPelanggan(customer.calonPelanggan);
-      setNomerTelepon(customer.nomerTelepon);
-      setEmail(customer.email);
-      setProject(customer.project);
-      setProduk(customer.produk);
-      setProyeksiNilai(customer.proyeksiNilai);
-      setLeadsCategory(customer.leadsCategory);
-      setAlamat(customer.alamat);
-      setKelurahan(customer.kelurahan);
-      setKecamatan(customer.kecamatan);
-      setKabupaten(customer.kabupaten);
-      setProvinsi(customer.provinsi);
-      setKodePos(customer.kodePos);
-      setStage(customer.currentStage);
-      setKeterangan(customer.keterangan);
-      setId(customer.idPelanggan);
-      setStatus(customer.leadsStatus);
-      setOpOpen(
-        customer.opportunitiesOpen
-          ? moment(customer.opportunitiesOpen, "DD/MM/YYYY").toDate()
-          : null
-      );
-      setOpClose(
-        customer.opportunitiesClose
-          ? moment(customer.opportunitiesClose, "DD/MM/YYYY").toDate()
-          : null
-      );
-      setNgOpen(
-        customer.negotiationOpen
-          ? moment(customer.negotiationOpen, "DD/MM/YYYY").toDate()
-          : null
-      );
-      setNgClose(
-        customer.negotiationClose
-          ? moment(customer.negotiationClose, "DD/MM/YYYY").toDate()
-          : null
-      );
-      setDlOpen(
-        customer.dealsOpen
-          ? moment(customer.dealsOpen, "DD/MM/YYYY").toDate()
-          : null
-      );
-      setDlClose(
-        customer.dealsClose
-          ? moment(customer.dealsClose, "DD/MM/YYYY").toDate()
-          : null
-      );
-      setDrOpen(
-        customer.droppedOpen
-          ? moment(customer.droppedOpen, "DD/MM/YYYY").toDate()
-          : null
-      );
-      setDrClose(
-        customer.droppedClose
-          ? moment(customer.droppedClose, "DD/MM/YYYY").toDate()
-          : null
-      );
-      setPrClose(
-        customer.proposalClose
-          ? moment(customer.proposalClose, "DD/MM/YYYY").toDate()
-          : null
-      );
-      setPrOpen(
-        customer.proposalOpen
-          ? moment(customer.proposalOpen, "DD/MM/YYYY").toDate()
-          : null
-      ); // 1st argument - string, 2nd argument - format
-    } else {
-      setIsEdit(false);
-    }
-  }, []);
+
+  const statusList = ["Open", "Close"];
+
+
+  var months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  var leadsCategoryList = ["High", "Medium", "Low"];
+
+
 
   //getter setter
-  const [Month, setMonth] = React.useState("");
-  const [BUP, setBUP] = React.useState("");
-  const [Status, setStatus] = React.useState("");
-  const [namaSales, setNamaSales] = React.useState("");
-  const [calonPelanggan, setCalonPelanggan] = React.useState("");
-  const [nomerTelepon, setNomerTelepon] = React.useState("");
+  const [isEdit, setIsEdit] = React.useState(false);
+  const { state } = useLocation();
+  const [departmentId, setDepartmentId] = React.useState("");
+  const [departmentName, setDepartmentName] = React.useState("");
+  const [id, setId] = React.useState("");
+  const [month, setMonth] = React.useState("");
+  const [salesName, setSalesName] = React.useState("");
+  const [potentialCustomer, setPotentialCustomer] = React.useState("");
+  const [address, setAddress] = React.useState("");
+  const [postalCode, setPostalCode] = React.useState("");
+  const [phoneNumber, setPhoneNumber] = React.useState("");
   const [email, setEmail] = React.useState("");
-  const [project, setProject] = React.useState("");
-  const [produk, setProduk] = React.useState("");
-  const [proyeksiNilai, setProyeksiNilai] = React.useState("");
+  const [product, setProduct] = React.useState({
+    name: ""
+  });
+  const [projectedValue, setProjectedValue] = React.useState("");
   const [leadsCategory, setLeadsCategory] = React.useState("");
-  const [alamat, setAlamat] = React.useState("");
-  const [kelurahan, setKelurahan] = React.useState("");
-  const [kecamatan, setKecamatan] = React.useState("");
-  const [kabupaten, setKabupaten] = React.useState("");
-  const [provinsi, setProvinsi] = React.useState("");
-  const [kodePos, setKodePos] = React.useState("");
-  const [Stage, setStage] = React.useState("");
-  const [keterangan, setKeterangan] = React.useState("");
-  const [id, setId] = React.useState(null);
+  const [opportunitiesOpen, setOpportunitiesOpen] = React.useState("");
+  const [opportunitiesClose, setOpportunitiesClose] = React.useState("");
+  const [proposalOpen, setProposalOpen] = React.useState("");
+  const [proposalClose, setProposalClose] = React.useState("");
+  const [negotiationOpen, setNegotiationOpen] = React.useState("");
+  const [negotiationClose, setNegotiationClose] = React.useState("");
+  const [dealsOpen, setDealsOpen] = React.useState("");
+  const [dealsClose, setDealsClose] = React.useState("");
+  const [droppedOpen, setDroppedOpen] = React.useState("");
+  const [droppedClose, setDroppedClose] = React.useState("");
+  const [currentStage, setCurrentStage] = React.useState("");
+  const [leadsStatus, setLeadsStatus] = React.useState("");
+  const [notes, setNotes] = React.useState("");
 
-  const [opClose, setOpClose] = React.useState(null);
-  const [opOpen, setOpOpen] = React.useState(null);
-
-  const [prOpen, setPrOpen] = React.useState(null);
-  const [prClose, setPrClose] = React.useState(null);
-
-  const [ngOpen, setNgOpen] = React.useState(null);
-  const [ngClose, setNgClose] = React.useState(null);
-
-  const [dlOpen, setDlOpen] = React.useState(null);
-  const [dlClose, setDlClose] = React.useState(null);
-
-  const [drOpen, setDrOpen] = React.useState(null);
-  const [drClose, setDrClose] = React.useState(null);
+  const [stage, setStage] = React.useState("");
 
   const [alert, setAlertMessage] = React.useState(null);
 
+  const [departmentLists, setDepartmentLists] = React.useState([]);
+  const [productList, setProductList] = React.useState([]);
+
+  const [open, setOpen] = React.useState(false);
+
+  const [modalTittle, setModalTittle] = React.useState("Information");
+  const [modalMessage, setModalMessage] = React.useState(
+    "Data berhasil disimpan"
+  );
+
   function doReset() {
+    setId("");
     setMonth("");
-    setBUP("");
-    setNamaSales("");
-    setCalonPelanggan("");
-    setNomerTelepon("");
+    setSalesName("");
+    setPotentialCustomer("");
+    setAddress("");
+    setPostalCode("");
+    setPhoneNumber("");
     setEmail("");
-    setProject("");
-    setProduk("");
-    setProyeksiNilai("");
+    setProduct(null);
+    setProjectedValue("");
     setLeadsCategory("");
-    setAlamat("");
-    setKelurahan("");
-    setKecamatan("");
-    setKabupaten("");
-    setProvinsi("");
-    setKodePos("");
-    setStage("");
-    setKeterangan("");
-    // setId("");
-    setStatus("");
-    setOpOpen("");
-    setOpClose("");
-    setNgOpen("");
-    setNgClose("");
-    setDlOpen("");
-    setDlClose("");
-    setDrOpen("");
-    setDrClose("");
-    setPrClose("");
-    setPrOpen(""); 
+    setOpportunitiesOpen("");
+    setOpportunitiesClose("");
+    setProposalOpen("");
+    setProposalClose("");
+    setNegotiationOpen("");
+    setNegotiationClose("");
+    setDealsOpen("");
+    setDealsClose("");
+    setDroppedOpen("");
+    setDroppedClose("");
+    setCurrentStage("");
+    setLeadsStatus("");
+    setNotes("");
   }
 
   function submitData() {
-    if (BUP==="") {
-      setAlertMessage("Field BUP is mandatory");
-      return;
-    } else if (namaSales==="") {
-      setAlertMessage("Field Nama Sales is mandatory");
-      return;
-    } else if (calonPelanggan==="") {
-      setAlertMessage("Field Calon Pelanggan is mandatory");
-      return;
-    } else if (project==="") {
-      setAlertMessage("Field Project is mandatory");
-      return;
-    } else if (produk==="") {
-      setAlertMessage("Field Produk is mandatory");
-      return;
-    } else if (proyeksiNilai==="") {
-      setAlertMessage("Field Proyeksi Nilai is mandatory");
-      return;
-    } else if (Stage==="") {
-      setAlertMessage("Field Current Stage is mandatory");
-      return;
-    } else if (Status==="") {
-      setAlertMessage("Field Status is mandatory");
+    console.log(month,
+      departmentId,
+      salesName,
+      potentialCustomer,
+      phoneNumber,
+      email,
+      product,
+      projectedValue,
+      leadsCategory,
+      currentStage,
+      leadsStatus);
+    if (
+      !month ||
+      !departmentId ||
+      !salesName ||
+      !potentialCustomer ||
+      !phoneNumber ||
+      !email ||
+      !product ||
+      !projectedValue ||
+      !leadsCategory ||
+      !currentStage ||
+      !leadsStatus) {
+      setAlertMessage("Please fill in all required fields");
       return;
     } else {
       setAlertMessage(null);
+
+      const formattedOpportunitiesOpen = opportunitiesOpen instanceof Date ? opportunitiesOpen.format("DD/MM/YYYY") : null;
+      const formattedOpportunitiesClose = opportunitiesClose instanceof Date ? opportunitiesClose.format("DD/MM/YYYY") : null;
+      const formattedProposalOpen = proposalOpen instanceof Date ? proposalOpen.format("DD/MM/YYYY") : null;
+      const formattedProposalClose = proposalClose instanceof Date ? proposalClose.format("DD/MM/YYYY") : null;
+      const formattedNegotiationOpen = negotiationOpen instanceof Date ? negotiationOpen.format("DD/MM/YYYY") : null;
+      const formattedNegotiationClose = negotiationClose instanceof Date ? negotiationClose.format("DD/MM/YYYY") : null;
+      const formattedDealsOpen = dealsOpen instanceof Date ? dealsOpen.format("DD/MM/YYYY") : null;
+      const formattedDealsClose = dealsClose instanceof Date ? dealsClose.format("DD/MM/YYYY") : null;
+      const formattedDroppedOpen = droppedOpen instanceof Date ? droppedOpen.format("DD/MM/YYYY") : null;
+      const formattedDroppedClose = droppedClose instanceof Date ? droppedClose.format("DD/MM/YYYY") : null;      
+
+      // Modify projectedValue
+      const modifiedProjectedValue = projectedValue.replace(/^\Rp. /, "").replace(/\./g, "");
+
+
       axios({
-        method: "post",
-        url: `${
-          isEdit
-            ? `${apis.server}/dashboard/edit/${id}`
-            : apis.server + "/dashboard/add"
-        }`,
+        method: `${isEdit
+          ? `put`
+          : "post"
+          }`,
+        url: `${isEdit
+          ? `${apis.server}/salesleads/${id}`
+          : apis.server + "/salesleads"
+          }`,
         data: {
-          alamat: alamat,
-          // area: area,
-          bulan: Month,
-          bup: BUP,
-          calonPelanggan: calonPelanggan,
-          currentStage: Stage,
-          dealsClose: dlClose
-            ? moment(new Date(dlClose)).format("DD/MM/YYYY")
-            : "",
-          dealsOpen: dlOpen
-            ? moment(new Date(dlOpen)).format("DD/MM/YYYY")
-            : "",
-          // domain: domain,
-          droppedClose: drClose
-            ? moment(new Date(drClose)).format("DD/MM/YYYY")
-            : "",
-          droppedOpen: drOpen
-            ? moment(new Date(drOpen)).format("DD/MM/YYYY")
-            : "",
-          email: email,
-          // jenisPerizinan: jenisPerizinan,
-          kabupaten: kabupaten,
-          kecamatan: kecamatan,
-          kelurahan: kelurahan,
-          keterangan: keterangan,
-          kodePos: kodePos,
-          leadsCategory: leadsCategory,
-          leadsStatus: Status,
-          negotiationClose: ngClose
-            ? moment(new Date(ngClose)).format("DD/MM/YYYY")
-            : "",
-          negotiationOpen: ngOpen
-            ? moment(new Date(ngOpen)).format("DD/MM/YYYY")
-            : "",
-          nomerTelepon: nomerTelepon,
-          opportunitiesClose: opClose
-            ? moment(new Date(ngOpen)).format("DD/MM/YYYY")
-            : "",
-          opportunitiesOpen: opOpen
-            ? moment(new Date(opOpen)).format("DD/MM/YYYY")
-            : "",
-          produk: produk,
-          project: project,
-          proposalClose: prClose
-            ? moment(new Date(prClose)).format("DD/MM/YYYY")
-            : "",
-          proposalOpen: prOpen
-            ? moment(new Date(prOpen)).format("DD/MM/YYYY")
-            : "",
-          provinsi: provinsi,
-          proyeksiNilai: proyeksiNilai.replace(/^\Rp. /, "").replace(/\./g, ""),
-          salesName: namaSales,
+          month,
+          salesName,
+          potentialCustomer,
+          address,
+          postalCode,
+          phoneNumber,
+          email,
+          product,
+          projectedValue: modifiedProjectedValue,
+          leadsCategory,
+          opportunitiesOpen: formattedOpportunitiesOpen,
+          opportunitiesClose: formattedOpportunitiesClose,
+          proposalOpen: formattedProposalOpen,
+          proposalClose: formattedProposalClose,
+          negotiationOpen: formattedNegotiationOpen,
+          negotiationClose: formattedNegotiationClose,
+          dealsOpen: formattedDealsOpen,
+          dealsClose: formattedDealsClose,
+          droppedOpen: formattedDroppedOpen,
+          droppedClose: formattedDroppedClose,
+          currentStage,
+          leadsStatus,
+          notes,
         },
         headers: {
-          Authorization: `Bearer ${
-            localStorage.token ? localStorage.token : ""
-          }`,
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
         },
       })
         .then((res) => {
@@ -383,16 +271,9 @@ function CustomerAdd(props) {
     }
   }
 
-  const [open, setOpen] = React.useState(false);
-
-  const [modalTittle, setModalTittle] = React.useState("Information");
-  const [modalMessage, setModalMessage] = React.useState(
-    "Data berhasil disimpan"
-  );
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  useEffect(() => {}, [opClose, opOpen]);
 
   function formatRupiah(angka, prefix) {
     var number_string = angka.replace(/[^,\d]/g, "").toString();
@@ -406,9 +287,89 @@ function CustomerAdd(props) {
       rupiah += separator + ribuan.join(".");
     }
 
-    rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
-    return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
+    rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
+    return prefix === undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
   }
+
+  const fetchUnitData = () => {
+    axios
+      .get(apis.server + `/departments`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
+        },
+      })
+      .then((res) => {
+        setDepartmentLists(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  const fetchProductData = () => {
+    if (departmentId) {
+      axios
+        .get(apis.server + `/products/department/${departmentId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+              }`,
+          },
+        })
+        .then((res) => {
+          setProductList(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+
+
+  useEffect(() => {
+    fetchUnitData();
+    if (state?.customer) {
+      setIsEdit(true);
+      const { customer } = state;
+      console.log(customer.id);
+      setId(customer.id);
+      setMonth(customer.month);
+      setSalesName(customer.salesName);
+      setPotentialCustomer(customer.potentialCustomer);
+      setAddress(customer.address);
+      setPostalCode(customer.postalCode);
+      setPhoneNumber(customer.phoneNumber);
+      setEmail(customer.email);
+      setProduct(customer.product);
+      setDepartmentId(customer?.product.department?.id)
+
+      setDepartmentName(customer?.product.department?.name)
+
+      setProjectedValue(customer.projectedValue);
+      setLeadsCategory(customer.leadsCategory);
+      setOpportunitiesOpen(customer.opportunitiesOpen);
+      setOpportunitiesClose(customer.opportunitiesClose);
+      setProposalOpen(customer.proposalOpen);
+      setProposalClose(customer.proposalClose);
+      setNegotiationOpen(customer.negotiationOpen);
+      setNegotiationClose(customer.negotiationClose);
+      setDealsOpen(customer.dealsOpen);
+      setDealsClose(customer.dealsClose);
+      setDroppedOpen(customer.droppedOpen);
+      setDroppedClose(customer.droppedClose);
+      setCurrentStage(customer.currentStage);
+      setStage(customer.currentStage);
+      setLeadsStatus(customer.leadsStatus);
+      setNotes(customer.notes);
+      fetchProductData();
+    } else {
+      setIsEdit(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProductData();
+  }, [departmentId]);
 
 
   return (
@@ -418,7 +379,7 @@ function CustomerAdd(props) {
         <div className="tittle-content">
           <ArrowBackIcon
             className="back-arrow"
-            onClick={() => navigate("/customer")}
+            onClick={() => navigate("/sales-lead")}
           />{" "}
           <label>{isEdit ? "Edit" : "Add"} Prospect/Leads</label>
         </div>
@@ -459,7 +420,7 @@ function CustomerAdd(props) {
                   onClick={() => {
                     modalTittle === "Warning"
                       ? setOpen(false)
-                      : navigate("/customer");
+                      : navigate("/sales-lead");
                   }}
                 >
                   OK
@@ -470,7 +431,7 @@ function CustomerAdd(props) {
           <div className="row-form">
             <div className="row-left">
               <div className="column-form">
-                {id ? (
+                {/* {id ? (
                   <div className="input-i">
                     <label>Customer ID</label>
                     <div>
@@ -479,7 +440,7 @@ function CustomerAdd(props) {
                   </div>
                 ) : (
                   ""
-                )}
+                )} */}
 
                 <div className="input-i">
                   <label>Month</label>
@@ -489,7 +450,7 @@ function CustomerAdd(props) {
                         id="Month"
                         size="small"
                         displayEmpty
-                        value={Month}
+                        value={month}
                         onChange={(e) => setMonth(e.target.value)}
                         input={<OutlinedInput />}
                         renderValue={(selected) => {
@@ -520,9 +481,8 @@ function CustomerAdd(props) {
                     <label
                       style={{
                         marginLeft: "1rem",
-                        color: `${
-                          alert ? "red" : "#8697b6"
-                        }`,
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
                         alignSelf: "center",
                       }}
                     >
@@ -531,16 +491,22 @@ function CustomerAdd(props) {
                   </div>
                 </div>
                 <div className="input-i">
-                  <label>Company</label>
+                  <label>Unit/Department</label>
                   <div className="input-i-txt">
                     <FormControl fullWidth>
                       <Select
-                        id="BUP"
+                        id="departement"
                         // className="input-style"
+                        value={departmentName}
+                        onChange={(e) => {
+                          const found = departmentLists.find((departement) => departement.name === e.target.value);
+                          setDepartmentId(found?.id)
+                          setDepartmentName(found?.name);
+                          setProduct(null);
+
+                        }}
                         size="small"
                         displayEmpty
-                        value={BUP}
-                        onChange={(e) => setBUP(e.target.value)}
                         input={<OutlinedInput />}
                         renderValue={(selected) => {
                           if (selected) {
@@ -553,128 +519,22 @@ function CustomerAdd(props) {
                         MenuProps={MenuProps}
                         inputProps={{ "aria-label": "Without label" }}
                       >
-                        <MenuItem key="BUP" value="BUP" style={getStyles()}>
-                          <em>Pilih Company</em>
+                        <MenuItem key="1" value="" style={getStyles()}>
+                          <em>Pilih Unit</em>
                         </MenuItem>
-                        {BUPLists.map((name) => (
-                          <MenuItem key={name} value={name} style={getStyles()}>
-                            {name}
+                        {departmentLists.map((departement, index) => (
+                          <MenuItem key={departement.id} value={departement.name} id={departement.id} style={getStyles()}>
+                            {departement.name}
                           </MenuItem>
                         ))}
                       </Select>
+
                     </FormControl>
                     <label
                       style={{
                         marginLeft: "1rem",
-                        color: `${
-                          alert ? "red" : "#8697b6"
-                        }`,
-                        alignSelf: "center",
-                      }}
-                    >
-                      *
-                    </label>
-                  </div>
-                </div>
-                <div className="input-i">
-                  <label>Sales Name</label>
-                  <div className="input-i-txt">
-                    <input
-                      onChange={(e) => setNamaSales(e.target.value)}
-                      value={namaSales}
-                    ></input>
-                    <label
-                      style={{
-                        marginLeft: "1rem",
-                        color: `${
-                          alert ? "red" : "#8697b6"
-                        }`,
-                        alignSelf: "center",
-                      }}
-                    >
-                      *
-                    </label>
-                  </div>
-                </div>
-                <div className="input-i">
-                  <label>Potential Customer Name</label>
-                  <div className="input-i-txt">
-                    <input
-                      onChange={(e) => setCalonPelanggan(e.target.value)}
-                      value={calonPelanggan}
-                    ></input>
-                    <label
-                      style={{
-                        marginLeft: "1rem",
-                        color: `${
-                          alert ? "red" : "#8697b6"
-                        }`,
-                        alignSelf: "center",
-                      }}
-                    >
-                      *
-                    </label>
-                  </div>
-                </div>
-
-
-                <div className="input-i">
-                  <label>Phone Number</label>
-                  <input
-                    onChange={(e) => setNomerTelepon(e.target.value)}
-                    value={nomerTelepon}
-                  ></input>
-                </div>
-                <div className="input-i">
-                  <label>Email Address</label>
-                  <input
-                    onChange={(e) => setEmail(e.target.value)}
-                    value={email}
-                  ></input>
-                </div>
-                <div className="input-i">
-                  <label>Project</label>
-                  <div className="input-i-txt">
-                    <FormControl fullWidth>
-                      <Select
-                        id="Project"
-                        // className="input-style"
-                        size="small"
-                        displayEmpty
-                        value={project}
-                        onChange={(e) => setProject(e.target.value)}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => {
-                          if (selected) {
-                            return (
-                              <label style={getStyles()}>{selected}</label>
-                            );
-                          }
-                          return <em style={getStyles()}>Pilih</em>;
-                        }}
-                        MenuProps={MenuProps}
-                        inputProps={{ "aria-label": "Without label" }}
-                      >
-                        <MenuItem
-                          key="Project"
-                          value="Project"
-                          style={getStyles()}
-                        >
-                          <em>Pilih Project</em>
-                        </MenuItem>
-                        {projectList.map((name) => (
-                          <MenuItem key={name} value={name} style={getStyles()}>
-                            {name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                    <label
-                      style={{
-                        marginLeft: "1rem",
-                        color: `${
-                          alert ? "red" : "#8697b6"
-                        }`,
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
                         alignSelf: "center",
                       }}
                     >
@@ -691,8 +551,11 @@ function CustomerAdd(props) {
                         // className="input-style"
                         size="small"
                         displayEmpty
-                        value={produk}
-                        onChange={(e) => setProduk(e.target.value)}
+                        value={product?.name}
+                        onChange={(e) => {
+                          const selectedProduct = productList.find((product) => product.name === e.target.value);
+                          setProduct(selectedProduct);
+                        }}
                         input={<OutlinedInput />}
                         renderValue={(selected) => {
                           if (selected) {
@@ -712,9 +575,9 @@ function CustomerAdd(props) {
                         >
                           <em>Pilih Produk</em>
                         </MenuItem>
-                        {productList.map((name) => (
-                          <MenuItem key={name} value={name} style={getStyles()}>
-                            {name}
+                        {productList.map((product) => (
+                          <MenuItem key={product.id} value={product.name} style={getStyles()}>
+                            {product.name}
                           </MenuItem>
                         ))}
                       </Select>
@@ -722,9 +585,86 @@ function CustomerAdd(props) {
                     <label
                       style={{
                         marginLeft: "1rem",
-                        color: `${
-                          alert ? "red" : "#8697b6"
-                        }`,
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
+                        alignSelf: "center",
+                      }}
+                    >
+                      *
+                    </label>
+                  </div>
+                </div>
+                <div className="input-i">
+                  <label>Sales Name</label>
+                  <div className="input-i-txt">
+                    <input
+                      onChange={(e) => setSalesName(e.target.value)}
+                      value={salesName}
+                    ></input>
+                    <label
+                      style={{
+                        marginLeft: "1rem",
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
+                        alignSelf: "center",
+                      }}
+                    >
+                      *
+                    </label>
+                  </div>
+                </div>
+                <div className="input-i">
+                  <label>Potential Customer Name</label>
+                  <div className="input-i-txt">
+                    <input
+                      onChange={(e) => setPotentialCustomer(e.target.value)}
+                      value={potentialCustomer}
+                    ></input>
+                    <label
+                      style={{
+                        marginLeft: "1rem",
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
+                        alignSelf: "center",
+                      }}
+                    >
+                      *
+                    </label>
+                  </div>
+                </div>
+
+
+                <div className="input-i">
+                  <label>Phone Number</label>
+                  <div className="input-i-txt">
+                    <input
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      value={phoneNumber}
+                    ></input>
+                    <label
+                      style={{
+                        marginLeft: "1rem",
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
+                        alignSelf: "center",
+                      }}
+                    >
+                      *
+                    </label>
+                  </div>
+                </div>
+                <div className="input-i">
+                  <label>Email Address</label>
+                  <div className="input-i-txt">
+                    <input
+                      onChange={(e) => setEmail(e.target.value)}
+                      value={email}
+                    ></input>
+                    <label
+                      style={{
+                        marginLeft: "1rem",
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
                         alignSelf: "center",
                       }}
                     >
@@ -736,15 +676,14 @@ function CustomerAdd(props) {
                   <label>Projected Value</label>
                   <div className="input-i-txt">
                     <input
-                      onChange={(e) => setProyeksiNilai(e.target.value)}
-                      value={formatRupiah(proyeksiNilai, "Rp.")}
+                      onChange={(e) => setProjectedValue(e.target.value)}
+                      value={formatRupiah(projectedValue, "Rp.")}
                     ></input>
                     <label
                       style={{
                         marginLeft: "1rem",
-                        color: `${
-                          alert ? "red" : "#8697b6"
-                        }`,
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
                         alignSelf: "center",
                       }}
                     >
@@ -789,6 +728,16 @@ function CustomerAdd(props) {
                         ))}
                       </Select>
                     </FormControl>
+                    <label
+                      style={{
+                        marginLeft: "1rem",
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
+                        alignSelf: "center",
+                      }}
+                    >
+                      *
+                    </label>
                   </div>
                 </div>
                 <div className="input-i">
@@ -799,8 +748,8 @@ function CustomerAdd(props) {
                         id="Stage"
                         size="small"
                         displayEmpty
-                        value={Stage}
-                        onChange={(e) => setStage(e.target.value)}
+                        value={currentStage}
+                        onChange={(e) => setCurrentStage(e.target.value)}
                         input={<OutlinedInput />}
                         renderValue={(selected) => {
                           if (selected) {
@@ -833,9 +782,9 @@ function CustomerAdd(props) {
                           disabled={
                             !isEdit
                               ? true
-                              : Stage == "Opportunities"
-                              ? false
-                              : true
+                              : stage == "Opportunities"
+                                ? false
+                                : true
                           }
                           key="Proposal"
                           value="Proposal"
@@ -846,7 +795,7 @@ function CustomerAdd(props) {
 
                         <MenuItem
                           disabled={
-                            !isEdit ? true : Stage == "Proposal" ? false : true
+                            !isEdit ? true : stage == "Proposal" ? false : true
                           }
                           key="Negotiation"
                           value="Negotiation"
@@ -859,9 +808,9 @@ function CustomerAdd(props) {
                           disabled={
                             !isEdit
                               ? true
-                              : Stage == "Negotiation"
-                              ? false
-                              : true
+                              : stage == "Negotiation"
+                                ? false
+                                : true
                           }
                           key="Deals"
                           value="Deals"
@@ -883,9 +832,8 @@ function CustomerAdd(props) {
                     <label
                       style={{
                         marginLeft: "1rem",
-                        color: `${
-                          alert ? "red" : "#8697b6"
-                        }`,
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
                         alignSelf: "center",
                       }}
                     >
@@ -901,8 +849,8 @@ function CustomerAdd(props) {
                         id="status"
                         size="small"
                         displayEmpty
-                        value={Status}
-                        onChange={(e) => setStatus(e.target.value)}
+                        value={leadsStatus}
+                        onChange={(e) => setLeadsStatus(e.target.value)}
                         input={<OutlinedInput />}
                         renderValue={(selected) => {
                           if (selected) {
@@ -928,9 +876,8 @@ function CustomerAdd(props) {
                     <label
                       style={{
                         marginLeft: "1rem",
-                        color: `${
-                          alert ? "red" : "#8697b6"
-                        }`,
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
                         alignSelf: "center",
                       }}
                     >
@@ -939,8 +886,32 @@ function CustomerAdd(props) {
                   </div>
                 </div>
 
-                
                 <div className="input-i">
+                  <label>Address</label>
+                  <div>
+                    <TextareaAutosize
+                      aria-label="minimum height"
+                      minRows={5}
+                      className="text-area-s"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="input-i">
+                  <label>Postal Code</label>
+                  <input
+                    onChange={(e) => setPostalCode(e.target.value)}
+                    value={postalCode}
+                  ></input>
+                </div>
+
+              </div>
+            </div>
+            <div className="row-right">
+              <div className="column-form">
+
+              <div className="input-i">
                   <label>Opportunities Open</label>
                   <div>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -951,9 +922,9 @@ function CustomerAdd(props) {
                           format="dd/MM/yyyy"
                           openTo="day"
                           views={["year", "month", "day"]}
-                          value={opOpen}
+                          value={opportunitiesOpen}
                           onChange={(newValue) => {
-                            setOpOpen(newValue);
+                            setOpportunitiesOpen(newValue);
                           }}
                           renderInput={(params) => (
                             <TextField
@@ -978,9 +949,9 @@ function CustomerAdd(props) {
                           format="dd/MM/yyyy"
                           openTo="day"
                           views={["year", "month", "day"]}
-                          value={opClose}
+                          value={opportunitiesClose}
                           onChange={(newValue) => {
-                            setOpClose(newValue);
+                            setOpportunitiesClose(newValue);
                           }}
                           renderInput={(params) => (
                             <TextField
@@ -1005,9 +976,9 @@ function CustomerAdd(props) {
                           format="dd/MM/yyyy"
                           openTo="day"
                           views={["year", "month", "day"]}
-                          value={prOpen}
+                          value={proposalOpen}
                           onChange={(newValue) => {
-                            setPrOpen(newValue);
+                            setProposalOpen(newValue);
                           }}
                           renderInput={(params) => (
                             <TextField
@@ -1032,9 +1003,9 @@ function CustomerAdd(props) {
                           format="dd/MM/yyyy"
                           openTo="day"
                           views={["year", "month", "day"]}
-                          value={prClose}
+                          value={proposalClose}
                           onChange={(newValue) => {
-                            setPrClose(newValue);
+                            setProposalClose(newValue);
                           }}
                           renderInput={(params) => (
                             <TextField
@@ -1048,10 +1019,6 @@ function CustomerAdd(props) {
                     </LocalizationProvider>
                   </div>
                 </div>
-              </div>
-            </div>
-            <div className="row-right">
-              <div className="column-form">
                 <div className="input-i">
                   <label>Negotiation Open</label>
                   <div>
@@ -1063,9 +1030,9 @@ function CustomerAdd(props) {
                           format="dd/MM/yyyy"
                           openTo="day"
                           views={["year", "month", "day"]}
-                          value={ngOpen}
+                          value={negotiationOpen}
                           onChange={(newValue) => {
-                            setNgOpen(newValue);
+                            setNegotiationOpen(newValue);
                           }}
                           renderInput={(params) => (
                             <TextField
@@ -1090,9 +1057,9 @@ function CustomerAdd(props) {
                           format="dd/MM/yyyy"
                           openTo="day"
                           views={["year", "month", "day"]}
-                          value={ngClose}
+                          value={negotiationClose}
                           onChange={(newValue) => {
-                            setNgClose(newValue);
+                            setNegotiationClose(newValue);
                           }}
                           renderInput={(params) => (
                             <TextField
@@ -1118,9 +1085,9 @@ function CustomerAdd(props) {
                           format="dd/MM/yyyy"
                           openTo="day"
                           views={["year", "month", "day"]}
-                          value={dlOpen}
+                          value={dealsOpen}
                           onChange={(newValue) => {
-                            setDlOpen(newValue);
+                            setDealsOpen(newValue);
                           }}
                           renderInput={(params) => (
                             <TextField
@@ -1145,9 +1112,9 @@ function CustomerAdd(props) {
                           format="dd/MM/yyyy"
                           openTo="day"
                           views={["year", "month", "day"]}
-                          value={dlClose}
+                          value={dealsClose}
                           onChange={(newValue) => {
-                            setDlClose(newValue);
+                            setDealsClose(newValue);
                           }}
                           renderInput={(params) => (
                             <TextField
@@ -1173,9 +1140,9 @@ function CustomerAdd(props) {
                           format="dd/MM/yyyy"
                           openTo="day"
                           views={["year", "month", "day"]}
-                          value={drOpen}
+                          value={droppedOpen}
                           onChange={(newValue) => {
-                            setDrOpen(newValue);
+                            setDroppedOpen(newValue);
                           }}
                           renderInput={(params) => (
                             <TextField
@@ -1200,9 +1167,9 @@ function CustomerAdd(props) {
                           format="dd/MM/yyyy"
                           openTo="day"
                           views={["year", "month", "day"]}
-                          value={drClose}
+                          value={droppedClose}
                           onChange={(newValue) => {
-                            setDrClose(newValue);
+                            setDroppedClose(newValue);
                           }}
                           renderInput={(params) => (
                             <TextField
@@ -1216,73 +1183,25 @@ function CustomerAdd(props) {
                     </LocalizationProvider>
                   </div>
                 </div>
-
-
                 <div className="input-i">
-                  <label>Address</label>
-                  <div>
-                    <TextareaAutosize
-                      aria-label="minimum height"
-                      minRows={5}
-                      className="text-area-s"
-                      value={alamat}
-                      onChange={(e) => setAlamat(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <div className="input-i">
-                  <label>Villages</label>
-                  <input
-                    onChange={(e) => setKelurahan(e.target.value)}
-                    value={kelurahan}
-                  ></input>
-                </div>
-                <div className="input-i">
-                  <label>District</label>
-                  <input
-                    onChange={(e) => setKecamatan(e.target.value)}
-                    value={kecamatan}
-                  ></input>
-                </div>
-                <div className="input-i">
-                  <label>Regency</label>
-                  <input
-                    onChange={(e) => setKabupaten(e.target.value)}
-                    value={kabupaten}
-                  ></input>
-                </div>
-                <div className="input-i">
-                  <label>Province</label>
-                  <input
-                    onChange={(e) => setProvinsi(e.target.value)}
-                    value={provinsi}
-                  ></input>
-                </div>
-                <div className="input-i">
-                  <label>Postal Code</label>
-                  <input
-                    onChange={(e) => setKodePos(e.target.value)}
-                    value={kodePos}
-                  ></input>
-                </div>
-                <div className="input-i">
-                  <label>Keterangan</label>
+                  <label>Notes</label>
                   <div>
                     <TextareaAutosize
                       aria-label="minimum height"
                       minRows={8}
                       className="text-area-s"
-                      value={keterangan}
-                      onChange={(e) => setKeterangan(e.target.value)}
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
                     />
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
           {alert !== null ? <Alert severity="error">{alert}</Alert> : ""}
           <div className="submit-form">
-            <div className="btn-cancel" onClick={()=>doReset()}>Reset</div>
+            <div className="btn-cancel" onClick={() => doReset()}>Reset</div>
             <div className="btn-half" onClick={() => submitData()}>
               Save
             </div>
@@ -1293,4 +1212,4 @@ function CustomerAdd(props) {
   );
 }
 
-export default CustomerAdd;
+export default SalesLeadsForm;

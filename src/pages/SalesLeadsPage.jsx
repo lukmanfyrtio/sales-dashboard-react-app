@@ -205,8 +205,8 @@ function SalesLeadsPage() {
       rupiah += separator + ribuan.join(".");
     }
 
-    rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
-    return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
+    rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
+    return prefix === undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
   }
 
   const fetchUnitData = () => {
@@ -268,7 +268,7 @@ function SalesLeadsPage() {
               className="btn-half"
               onClick={() => {
                 if (modalTittle === "Warning - Delete") {
-                  if (deletePr == 1) {
+                  if (deletePr === 1) {
                     handleDelete(deletedID);
                   } else {
                     navigate("/403");
@@ -407,7 +407,7 @@ function SalesLeadsPage() {
           <div className="add-btn-row">
             <div
               className="button-c"
-              onClick={() => navigate("/customer/upload")}
+              onClick={() => navigate("/sales-lead/upload")}
             >
               <div className="btn-padding">
                 <span className="material-icons-sharp">add</span>
@@ -421,7 +421,7 @@ function SalesLeadsPage() {
                 setOpenLoad(true);
                 const method = "GET";
 
-                const url = apis.server + "/dashboard/download";
+                const url = apis.server + "/salesleads/export";
 
                 axios
 
@@ -460,7 +460,7 @@ function SalesLeadsPage() {
                     const formattedTimestamp = `${year}${month}${day}${hours}${minutes}${seconds}`;
 
                     // Create the static string with the timestamp
-                    const staticString = `Customer_${formattedTimestamp}`;
+                    const staticString = `sales_leads_${formattedTimestamp}`;
                     link.setAttribute("download", staticString + ".xlsx"); //any other extension
 
                     document.body.appendChild(link);
@@ -480,8 +480,8 @@ function SalesLeadsPage() {
             <div
               className="button-c"
               onClick={() => {
-                if (create == 1) {
-                  navigate("/customer/add");
+                if (create === 1) {
+                  navigate("/sales-lead/add");
                 } else {
                   navigate("/403");
                 }
@@ -532,7 +532,7 @@ function SalesLeadsPage() {
                 )}
 
                 {list.map((row) => (
-                  <StyledTableRow key={row.idPelanggan}>
+                  <StyledTableRow key={row.id}>
                     <StyledTableCell component="th" scope="row">
                       <span
                         cl="dot"
@@ -543,31 +543,31 @@ function SalesLeadsPage() {
                               : row.countDays > 8
                                 ? "yellow"
                                 : "green"
-                            : row.currentStage == "Proposal"
+                            : row.currentStage === "Proposal"
                               ? row.countDays > 20
                                 ? "red"
                                 : row.countDays > 18
                                   ? "yellow"
                                   : "green"
-                              : row.currentStage == "Proposal"
+                              : row.currentStage === "Proposal"
                                 ? row.countDays > 20
                                   ? "red"
                                   : row.countDays > 18
                                     ? "yellow"
                                     : "green"
-                                : row.currentStage == "Negotiation"
+                                : row.currentStage === "Negotiation"
                                   ? row.countDays > 40
                                     ? "red"
                                     : row.countDays > 40 - 2
                                       ? "yellow"
                                       : "green"
-                                  : row.currentStage == "Deals"
+                                  : row.currentStage === "Deals"
                                     ? row.countDays > 20
                                       ? "red"
                                       : row.countDays > 20 - 2
                                         ? "yellow"
                                         : "green"
-                                    : row.currentStage == "Dropped"
+                                    : row.currentStage === "Dropped"
                                       ? row.countDays > 20
                                         ? "red"
                                         : row.countDays > 20 - 2
@@ -618,7 +618,7 @@ function SalesLeadsPage() {
                           aria-label="delete"
                           color="error"
                           onClick={(_) => {
-                            if (deletePr == 1) {
+                            if (deletePr === 1) {
                               setOpen(true);
                               setModalTittle("Warning - Delete");
                               setModalMessage(
@@ -636,8 +636,8 @@ function SalesLeadsPage() {
                           aria-label="edit"
                           color="primary"
                           onClick={(_) => {
-                            if (update == 1) {
-                              navigate("/customer/edit", {
+                            if (update === 1) {
+                              navigate("/sales-lead/edit", {
                                 state: {
                                   customer: row,
                                 },

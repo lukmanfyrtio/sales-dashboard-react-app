@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import Header from "../components/Header";
+import Header from "../components/Header.jsx";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useLocation, useNavigate } from "react-router-dom";
 import OutlinedInput from "@mui/material/OutlinedInput";
@@ -21,6 +21,7 @@ import Modal from "@mui/material/Modal";
 import moment from "moment";
 
 import apis from "../apis.js";
+import { Alert } from "@mui/material";
 
 const style = {
   position: "absolute",
@@ -38,7 +39,7 @@ const style = {
   fontFamily: "Poppins",
 };
 
-function SalesTargetAdd() {
+function CompanyTargetForm() {
   const navigate = useNavigate();
 
   //set select
@@ -76,15 +77,16 @@ function SalesTargetAdd() {
     };
   }
 
-  const BUPLists = localStorage.bup==="ALL"?["SWAMEDIA", "MOTIO", "SWADAMA"]:[localStorage.bup];
-
-  const [id, setId] = React.useState();
-  const [BUP, setBup] = React.useState("");
   const [tahun, setTahun] = React.useState(null);
+  const [alert, setAlertMessage] = React.useState(null);
 
   const [modalMessage, setModalMessage] = React.useState(
     "Data berhasil disimpan"
   );
+
+  const [departmentLists, setDepartmentLists] = React.useState([]);
+  const [departmentId, setDepartmentId] = React.useState("");
+  const [departmentName, setDepartmentName] = React.useState("");
   const [isEdit, setIsEdit] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [modalTittle, setModalTittle] = React.useState("Information");
@@ -120,25 +122,25 @@ function SalesTargetAdd() {
 
   const { state } = useLocation();
   useEffect(() => {
+    fetchUnitData();
     if (state?.sales) {
-      var sales =state.sales;
-        setIsEdit(true);
-        axios
-        .get(apis.server + "/sales-target/detail/"+sales.tahun, {
+      var sales = state.sales;
+      setIsEdit(true);
+      axios
+        .get(apis.server + "/company-targets/detail/" + sales.year, {
           params: {
-            bup: sales.bup ? sales.bup : null,
+            departmentId: sales.department.id ? sales.department.id : null,
           },
           headers: {
-            Authorization: `Bearer ${
-              localStorage.token ? localStorage.token : ""
-            }`,
+            Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+              }`,
           },
         })
         .then((res) => {
-          const data=res.data.data;
-          setTahun(data.tahun)
-          setBup(data.bup)
-
+          const data = res.data.data;
+          setTahun(data.year)
+          setDepartmentId(data.departmentId)
+          setDepartmentName(sales?.department?.name);
           setExistingJanuari(data.existing.january)
           setExistingFebruari(data.existing.february)
           setExistingMaret(data.existing.march)
@@ -175,116 +177,125 @@ function SalesTargetAdd() {
   }, []);
 
   function submitData() {
+    if (
+      !tahun||
+      !departmentId
+    ) {
+      setAlertMessage("Please fill in all required fields");
+      return;
+    }
     axios({
-      method: "post",
-      url: `${
-        isEdit
-          ? `${apis.server}/sales-target/edit`
-          : apis.server+"/sales-target/add"
-      }`,
+      method: `${isEdit
+        ? `put`
+        : "post"
+        }`,
+      url: `${isEdit
+          ? `${apis.server}/company-targets`
+          : apis.server + "/company-targets"
+        }`,
       data: {
-        tahun:tahun? moment(new Date(tahun)).format("YYYY")  : "",
-        bup:BUP,
+        year: tahun ? moment(new Date(tahun)).format("YYYY") : "",
+        departmentId: departmentId,
         "existing": [
           {
-              "bulan": "January",
-              "value": existingJanuari
+            "month": "January",
+            "value": existingJanuari
           },
           {
-              "bulan": "February",
-              "value": existingFebruari
+            "month": "February",
+            "value": existingFebruari
           },
           {
-              "bulan": "March",
-              "value": existingMaret
+            "month": "March",
+            "value": existingMaret
           },
           {
-              "bulan": "April",
-              "value": existingApril
+            "month": "April",
+            "value": existingApril
           },
           {
-              "bulan": "May",
-              "value": existingMei
+            "month": "May",
+            "value": existingMei
           },
           {
-              "bulan": "June",
-              "value": existingJune
+            "month": "June",
+            "value": existingJune
           },
           {
-              "bulan": "July",
-              "value": existingJuly
+            "month": "July",
+            "value": existingJuly
           },
           {
-              "bulan": "August",
-              "value": existingAgustus
+            "month": "August",
+            "value": existingAgustus
           },
           {
-              "bulan": "September",
-              "value": existingSeptember
+            "month": "September",
+            "value": existingSeptember
           },
           {
-              "bulan": "October",
-              "value": existingOctober
+            "month": "October",
+            "value": existingOctober
           },
           {
-              "bulan": "November",
-              "value": existingNovember
+            "month": "November",
+            "value": existingNovember
           },
           {
-              "bulan": "December",
-              "value": existingDecember
+            "month": "December",
+            "value": existingDecember
           }
-      ],
-      "target": [
-        {
-          "bulan": "January",
-          "value": targetJanuari
-      },
-      {
-          "bulan": "February",
-          "value": targetFebruari
-      },
-      {
-          "bulan": "March",
-          "value": targetMaret
-      },
-      {
-          "bulan": "April",
-          "value": targetApril
-      },
-      {
-          "bulan": "May",
-          "value": targetMei
-      },
-      {
-          "bulan": "June",
-          "value": targetJune
-      },
-      {
-          "bulan": "July",
-          "value": targetJuly
-      },
-      {
-          "bulan": "August",
-          "value": targetAgustus
-      },
-      {
-          "bulan": "September",
-          "value": targetSeptember
-      },
-      {
-          "bulan": "October",
-          "value": targetOctober
-      },
-      {
-          "bulan": "November",
-          "value": targetNovember
-      },
-      {
-          "bulan": "December",
-          "value": targetDecember
-      }
-      ]
+        ],
+        "target": [
+          {
+            "month": "January",
+            "value": targetJanuari
+          },
+          {
+            "month": "February",
+            "value": targetFebruari
+          },
+          {
+            "month": "March",
+            "value": targetMaret
+          },
+          {
+            "month": "April",
+            "value": targetApril
+          },
+          {
+            "month": "May",
+            "value": targetMei
+          },
+          {
+            "month": "June",
+            "value": targetJune
+          },
+          {
+            "month": "July",
+            "value": targetJuly
+          },
+          {
+            "month": "August",
+            "value": targetAgustus
+          },
+          {
+            "month": "September",
+            "value": targetSeptember
+          },
+          {
+            "month": "October",
+            "value": targetOctober
+          },
+          {
+            "month": "November",
+            "value": targetNovember
+          },
+          {
+            "month": "December",
+            "value": targetDecember
+          }
+        ]
       },
       headers: {
         Authorization: `Bearer ${localStorage.token ? localStorage.token : ""}`,
@@ -305,6 +316,22 @@ function SalesTargetAdd() {
       });
   }
 
+  const fetchUnitData = () => {
+    axios
+      .get(apis.server + `/departments`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
+            }`,
+        },
+      })
+      .then((res) => {
+        setDepartmentLists(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
 
   return (
     <div>
@@ -313,7 +340,7 @@ function SalesTargetAdd() {
         <div className="tittle-content">
           <ArrowBackIcon
             className="back-arrow"
-            onClick={() => navigate("/sales-target")}
+            onClick={() => navigate("/company-target")}
           />{" "}
           <label>{isEdit ? "Edit" : "Add"} Target & Existing</label>
         </div>
@@ -353,7 +380,7 @@ function SalesTargetAdd() {
                   onClick={() => {
                     modalTittle === "Warning"
                       ? setOpen(false)
-                      : navigate("/sales-target");
+                      : navigate("/company-target");
                   }}
                 >
                   OK
@@ -364,29 +391,22 @@ function SalesTargetAdd() {
           <div className="row-form">
             <div className="row-left">
               <div className="column-form">
-                {id ? (
-                  <div className="input-i">
-                    <label>ID</label>
-                    <div>
-                      <label>{id}</label>
-                    </div>
-                  </div>
-                ) : (
-                  ""
-                )}
 
                 <div className="input-i">
-                  <label>Company</label>
-                  <div>
-                    <FormControl sx={{ m: 0, width: 200, mt: 0 }}>
+                  <label>Unit/Department</label>
+                  <div className="input-i-txt">
+                    <FormControl fullWidth>
                       <Select
-                        id="BUP"
-                        className="input-style"
+                        id="departement"
+                        // className="input-style"
+                        value={departmentName}
+                        onChange={(e) => {
+                          const found = departmentLists.find((departement) => departement.name === e.target.value);
+                          setDepartmentId(found?.id)
+                          setDepartmentName(found?.name);
+                        }}
                         size="small"
-                        disabled={isEdit}
                         displayEmpty
-                        value={BUP}
-                        onChange={(e) => setBup(e.target.value)}
                         input={<OutlinedInput />}
                         renderValue={(selected) => {
                           if (selected) {
@@ -394,21 +414,32 @@ function SalesTargetAdd() {
                               <label style={getStyles()}>{selected}</label>
                             );
                           }
-                          return <em style={getStyles()}>Pilih</em>;
+                          return <em style={getStyles()}>-</em>;
                         }}
                         MenuProps={MenuProps}
                         inputProps={{ "aria-label": "Without label" }}
                       >
-                        <MenuItem key="BUP" value="BUP" style={getStyles()}>
-                          <em>Pilih Company</em>
+                        <MenuItem key="1" value="" style={getStyles()}>
+                          <em>Pilih Unit</em>
                         </MenuItem>
-                        {BUPLists.map((name) => (
-                          <MenuItem key={name} value={name} style={getStyles()}>
-                            {name}
+                        {departmentLists.map((departement, index) => (
+                          <MenuItem key={departement.id} value={departement.name} id={departement.id} style={getStyles()}>
+                            {departement.name}
                           </MenuItem>
                         ))}
                       </Select>
+
                     </FormControl>
+                    <label
+                      style={{
+                        marginLeft: "1rem",
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
+                        alignSelf: "center",
+                      }}
+                    >
+                      *
+                    </label>
                   </div>
                 </div>
               </div>
@@ -543,6 +574,16 @@ function SalesTargetAdd() {
                         />
                       </Stack>
                     </LocalizationProvider>
+                    <label
+                      style={{
+                        marginLeft: "1rem",
+                        color: `${alert ? "red" : "#8697b6"
+                          }`,
+                        alignSelf: "center",
+                      }}
+                    >
+                      *
+                    </label>
                   </div>
                 </div>
               </div>
@@ -651,6 +692,7 @@ function SalesTargetAdd() {
               </div>
             </div>
           </div>
+          {alert !== null ? <Alert severity="error">{alert}</Alert> : ""}
           <div className="submit-form">
             <div className="btn-cancel">Reset</div>
             <div className="btn-half" onClick={() => submitData()}>
@@ -663,4 +705,4 @@ function SalesTargetAdd() {
   );
 }
 
-export default SalesTargetAdd;
+export default CompanyTargetForm;

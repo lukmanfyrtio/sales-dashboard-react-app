@@ -199,7 +199,7 @@ function CompanyTargetPage() {
               className="button-c"
               onClick={() => {
                 if (create == 1) {
-                  navigate("/sales-target/add")
+                  navigate("/company-target/add")
                 } else {
                   navigate("/403");
                 }
@@ -269,7 +269,7 @@ function CompanyTargetPage() {
                           color="primary"
                           onClick={(_) => {
                             if (update == 1) {
-                              navigate("/sales-target/edit", {
+                              navigate("/company-target/edit", {
                                 state: {
                                   sales: row,
                                 },
