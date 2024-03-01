@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 
 import { useAuthContext } from "@asgardeo/auth-react";
 import { ThreeDots } from "react-loader-spinner";
+import { useLocation } from "react-router-dom";
 
 
 
@@ -11,11 +12,18 @@ function LoginPage() {
         state
     } = useAuthContext();
 
+    const location = useLocation();
+    const redirectUrl = new URLSearchParams(location.search).get('code');
+
+
     useEffect(() => {
         if (state.isAuthenticated) {
             return;
         }
-        signIn();
+        console.log(redirectUrl);
+        if (!redirectUrl) {
+            signIn();
+        }
 
     }, [state.isAuthenticated])
 
