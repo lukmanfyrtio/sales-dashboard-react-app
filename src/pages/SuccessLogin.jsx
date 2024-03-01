@@ -91,12 +91,12 @@ function SuccessLogin() {
 
 
     const submitData = async (e) => {
-        setExistUser(true);
         if (!company) {
             setAlertMessage("Please fill in all required fields");
             return;
         }
         setAlertMessage(null)
+        setExistUser(true);
         axios({
             method: "post",
             url: apis.server + "/usermappings",
