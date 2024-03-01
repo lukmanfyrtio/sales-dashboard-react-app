@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import logo from "../assets/images/swamedia.png";
+import logo from "../assets/images/logo.png";
 import { useNavigate, useLocation } from "react-router";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";

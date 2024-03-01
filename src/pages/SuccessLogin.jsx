@@ -5,7 +5,7 @@ import { ThreeDots } from "react-loader-spinner";
 import { Alert, FormControl, MenuItem, OutlinedInput, Select } from "@mui/material";
 import axios from "axios";
 import apis from "../apis.js";
-
+import logo from "../assets/images/logo.png";
 
 const ITEM_HEIGHT = 30;
 const ITEM_PADDING_TOP = 8;
@@ -148,7 +148,7 @@ function SuccessLogin() {
                     <div className="signup">
                         <div className="signup-form">
                             <div className="logo-signup">
-                                {/* <img src={logo} alt="logo" className="logo-s" /> */}
+                                <img src={logo} alt="logo" className="logo-s" />
                                 <label>Complete Your Profile</label>
                                 <label>Welcome to our platform! To enhance your experience, please take a moment to complete your profile.</label>
                             </div>
