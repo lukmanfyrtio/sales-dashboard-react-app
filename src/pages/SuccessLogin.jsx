@@ -91,6 +91,7 @@ function SuccessLogin() {
 
 
     const submitData = async (e) => {
+        setExistUser(true);
         if (!company) {
             setAlertMessage("Please fill in all required fields");
             return;
