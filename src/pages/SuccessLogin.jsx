@@ -35,61 +35,58 @@ function SuccessLogin() {
 
     const [company, setCompany] = React.useState(null);
 
-    const [user, setUser] = React.useState(true);
+    const [existUser, setExistUser] = React.useState(true);
     const [alert, setAlertMessage] = React.useState(null);
 
-    const fetchDataCompany = () => {
-        axios
-            .get(apis.server + `/companies`, {
+    const fetchDataCompany = async () => {
+        try {
+            const res = await axios.get(apis.server + '/companies', {
                 headers: {
-                    Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
-                        }`,
+                    Authorization: `Bearer ${localStorage.token || ''}`,
                 },
-            })
-            .then((res) => {
-                setCompanies(res.data);
-            })
-            .catch((err) => {
-                console.log(err);
             });
-    }
+            setCompanies(res.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
-    const fetchUserMapping = () => {
-        axios
-            .get(apis.server + `/usermappings/userId?id=${state.sub}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
-                        }`,
-                },
-            })
-            .then((res) => {
-                localStorage.setItem("user", JSON.stringify(res.data));
-                setUser(false);
-            })
-            .catch((err) => {
-                setUser(true);
-                console.log(err);
-            });
-    }
+    const fetchUserMapping = async () => {
+        try {
+            const res = await axios.get(
+                apis.server + `/usermappings/userId?id=${state.sub}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.token || ''}`,
+                    },
+                }
+            );
+            localStorage.setItem('user', JSON.stringify(res.data));
+            setExistUser(true);
+            navigate('/dashboard');
+        } catch (error) {
+            setExistUser(false);
+            console.error(error);
+        }
+    };
 
     useEffect(() => {
-        if (state.isAuthenticated) {
-            fetchDataCompany();
+        const fetchData = async () => {
+            if (state.isAuthenticated) {
+                await fetchDataCompany();
 
-
-            getAccessToken()
-                .then((token) => {
-                    localStorage.setItem("token", token);
-                    fetchUserMapping();
-                })
-                .catch((error) => {
-                    console.error("Unexpected error ex:", error);
-                });
-            if (!user) {
-                navigate("/dashboard")
+                try {
+                    const token = await getAccessToken();
+                    localStorage.setItem('token', token);
+                    await fetchUserMapping();
+                } catch (error) {
+                    console.error('Unexpected error:', error);
+                }
             }
-        }
-    }, [state.isAuthenticated, getAccessToken, navigate.user])
+        };
+
+        fetchData();
+    }, [state.isAuthenticated, existUser]);
 
 
 
@@ -115,35 +112,37 @@ function SuccessLogin() {
             .then(function (response) {
                 console.log(response);
                 if (response.status === 200) {
-                    setUser(false);
+                    setExistUser(true);
                     localStorage.setItem("user", JSON.stringify(response.data));
                     navigate("/dashboard");
                 } else {
-                    setUser(true);
+                    setExistUser(false);
                 }
             })
             .catch(function (error) {
                 console.log(error);
-                setUser(true);
+                setExistUser(false);
             });
     };
-    if (!user) {
-        navigate("/dashboard")
-    }
-    return (
-        <>
-            {!user ?
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column', textAlign: "center" }}>
-                    <ThreeDots
-                        visible={true}
-                        color="#0c75d6"
-                        radius="10"
-                        ariaLabel="three-dots-loading"
-                        wrapperStyle={{}}
-                        wrapperClass=""
-                    />
-                    <p>If the page does not change within 5 seconds, please <a href="/">click here</a>.</p>
-                </div> :
+
+    console.log("render : "+existUser);
+
+    if (existUser) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column', textAlign: "center" }}>
+                <ThreeDots
+                    visible={true}
+                    color="#0c75d6"
+                    radius="10"
+                    ariaLabel="three-dots-loading"
+                    wrapperStyle={{}}
+                    wrapperClass=""
+                />
+                <p>If the page does not change within 5 seconds, please <a href="/">click here</a>.</p>
+            </div>);
+    }else {
+        return (
+            <>
                 <div className="content">
                     <div className="signup">
                         <div className="signup-form">
@@ -197,10 +196,11 @@ function SuccessLogin() {
                             <button className="submit" onClick={submitData}>Continue</button>
                         </div>
                     </div>
-                </div>}
+                </div>
 
-        </>
-    );
+            </>
+        );
+    }
 }
 
 export default SuccessLogin;

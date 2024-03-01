@@ -12,6 +12,7 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
+import { set } from "date-fns/esm";
 
 const AdminDashboard = (props) => {
   var months = [
@@ -28,6 +29,7 @@ const AdminDashboard = (props) => {
     "November",
     "December",
   ];
+
   const d = new Date();
   let monthN = d.getMonth();
   let year = d.getFullYear();
@@ -88,6 +90,7 @@ const AdminDashboard = (props) => {
   };
 
   const currentYear = new Date().getFullYear();
+
   var listYear = [
     Number(currentYear),
     Number(currentYear - 1),
@@ -106,150 +109,121 @@ const AdminDashboard = (props) => {
       opportunities: 0,
       proposal: 0,
     },
-    openLoad: true,
-    filterYear: new Date().getFullYear(),
-    dataDepartements: [],
     departements: [],
-    data: {
-      labels: new Date().getFullYear() === year ? monthArray : months,
-      datasets: [
-        {
-          label: "Target",
-          data: Array(12).fill(0).map((value) => round(value)),
-          backgroundColor: "#3b71ca",
-          borderColor: "#3b71ca",
-          borderWidth: 1,
-        },
-        {
-          label: "Actual",
-          data: Array(12).fill(0).map((value) => round(value)),
-          backgroundColor: "#00b541",
-          borderColor: "#00b541",
-          borderWidth: 1,
-        },
-      ],
-    }
+  });
+
+  const [filterYear, setFilterYear] = useState(new Date().getFullYear());
+
+  const [openLoad, setOpenLoad] = useState(true);
+
+  const [dataDepartements, setDataDepartements] = useState([]);
+
+  const [data, setData] = useState({
+    labels: new Date().getFullYear() === year ? monthArray : months,
+    datasets: [
+      {
+        label: "Target",
+        data: Array(12).fill(0).map((value) => round(value)),
+        backgroundColor: "#3b71ca",
+        borderColor: "#3b71ca",
+        borderWidth: 1,
+      },
+      {
+        label: "Actual",
+        data: Array(12).fill(0).map((value) => round(value)),
+        backgroundColor: "#00b541",
+        borderColor: "#00b541",
+        borderWidth: 1,
+      },
+    ],
   });
 
 
 
   const fetchDataForDepartment = async (year) => {
-    var months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
+    console.log("fetchDataForDepartment");
+
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
     ];
 
-    var dataDepartementsTemp = [];
-    await axios
-      .get(apis.server + "/departments/display/top3", {
-        params: {
-          tahun: year,
-        },
-        headers: {
-          Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
-            }`,
-        },
-      })
-      .then((res) => {
-        setState(prevState => ({
-          ...prevState,
-          departements: res.data,
-        }));
+    try {
+      const response = await axios.get(apis.server + "/departments/display/top3", {
+        params: { tahun: year },
+        headers: { Authorization: `Bearer ${localStorage.token || ""}` },
+      });
 
-        res.data.forEach((dataDepartement, index) => {
-          var departmentUUID = dataDepartement.id;
-          var departmentName = dataDepartement.name;
+      setState((prevState) => ({
+        ...prevState,
+        departements: response.data,
+      }));
+
+      const dataDepartementsTemp = await Promise.all(
+        response.data.map(async (dataDepartement) => {
+          const departmentUUID = dataDepartement.id;
+          const departmentName = dataDepartement.name;
 
           try {
-            axios.get(apis.server + "/dashboard/target-actual", {
-              params: {
-                departementUUID: departmentUUID,
-                tahun: year,
-              },
-              headers: {
-                Authorization: `Bearer ${localStorage.token ? localStorage.token : ""}`,
-              },
-            }).then((res) => {
-              const resultActual = res.data.data.actual.map(x => Number(x));
-              const resultTarget = res.data.data.target.map(x => Number(x));
-              const d = new Date();
-              const monthN = d.getMonth();
-              var dataDepartement =
-              {
-                id: departmentUUID,
-                name: departmentName,
-                resultDataActual: resultActual,
-                resultDataTarget: resultTarget,
-                dataChart: {
-                  labels: [
-                    months[Number(monthN)],
-                    months[Number(monthN - 1)],
-                    months[Number(monthN - 2)],
-                  ],
-                  datasets: [
-                    {
-                      label: "Target",
-                      data: [
-                        resultTarget[Number(monthN)],
-                        resultTarget[Number(monthN - 1)],
-                        resultTarget[Number(monthN - 2)],
-                      ],
-                      backgroundColor: "#3b71ca",
-                      borderColor: "#3b71ca",
-                      borderWidth: 1,
-                    },
-                    {
-                      label: "Actual",
-                      data: [
-                        resultActual[Number(monthN)],
-                        resultActual[Number(monthN - 1)],
-                        resultActual[Number(monthN - 2)],
-                      ],
-                      backgroundColor: "#00b541",
-                      borderColor: "#00b541",
-                      borderWidth: 1,
-                    },
-                  ],
-                },
-              };
-              dataDepartementsTemp.push(dataDepartement);;
-            })
-              .catch((err) => {
-                console.error({ err });
-              });
+            const res = await axios.get(apis.server + "/dashboard/target-actual", {
+              params: { departementUUID: departmentUUID, tahun: year },
+              headers: { Authorization: `Bearer ${localStorage.token || ""}` },
+            });
 
+            const resultActual = res.data.data.actual.map(Number);
+            const resultTarget = res.data.data.target.map(Number);
+
+            const d = new Date();
+            const monthN = d.getMonth();
+
+            const dataDepartement = {
+              id: departmentUUID,
+              name: departmentName,
+              resultDataActual: resultActual,
+              resultDataTarget: resultTarget,
+              dataChart: {
+                labels: [months[monthN], months[monthN - 1], months[monthN - 2]],
+                datasets: [
+                  {
+                    label: "Target",
+                    data: [resultTarget[monthN], resultTarget[monthN - 1], resultTarget[monthN - 2]],
+                    backgroundColor: "#3b71ca",
+                    borderColor: "#3b71ca",
+                    borderWidth: 1,
+                  },
+                  {
+                    label: "Actual",
+                    data: [resultActual[monthN], resultActual[monthN - 1], resultActual[monthN - 2]],
+                    backgroundColor: "#00b541",
+                    borderColor: "#00b541",
+                    borderWidth: 1,
+                  },
+                ],
+              },
+            };
+
+            return dataDepartement;
           } catch (err) {
             console.error({ err });
           }
-        });
-        setState(prevState => ({
-          ...prevState,
-          dataDepartements: dataDepartementsTemp,
-        }));
+        })
+      );
 
-      })
-      .catch((err) => {
-        console.error({ err });
-      });
-
+      setDataDepartements(dataDepartementsTemp);
+      return dataDepartementsTemp;
+    } catch (err) {
+      console.error({ err });
+    }
   };
 
 
-  const getList = () => {
-    axios
+
+  const getList = async () => {
+    console.log("getList");
+    await axios
       .get(apis.server + "/dashboard/target-breakdown-all", {
         params: {
-          tahun: state.filterYear,
+          tahun: filterYear,
         },
         headers: {
           Authorization: `Bearer ${localStorage.token ? localStorage.token : ""
@@ -268,65 +242,71 @@ const AdminDashboard = (props) => {
       });
   };
 
-  useEffect(() => {
-    setState(prevState => ({
-      ...prevState,
-      openLoad: true,
-    }));
+  const calculateSumsAndSetData = async (dataDepartements, year) => {
+    const sums = {
+      Target: Array(12).fill(0),
+      Actual: Array(12).fill(0),
+    };
 
-    getList();
-    fetchDataForDepartment(state.filterYear);
-
-    setTimeout(() => {
-      // Set openLoad to false to hide the loader when the data is loaded
-      setState(prevState => ({
-        ...prevState,
-        openLoad: false,
-      }));
-
-    }, 3000); // You can adjust the delay as needed
-    // eslint-disable-next-line no-use-before-define
-  }, [state.filterYear]);
-
-  const sums = {
-    Target: Array(12).fill(0),
-    Actual: Array(12).fill(0)
-  };
-  state.dataDepartements.forEach((item) => {
-    // Loop through each month
-    item.resultDataTarget.forEach((value, index) => {
-      // Sum the values for Target and Actual
-      sums.Target[index] += value;
-      sums.Actual[index] += item.resultDataActual[index];
+    dataDepartements.forEach((item) => {
+      // Loop through each month
+      item.resultDataTarget.forEach((value, index) => {
+        // Sum the values for Target and Actual
+        sums.Target[index] += value;
+        sums.Actual[index] += item.resultDataActual[index];
+      });
     });
-  });
-  // Create the data object
-  const data = {
-    labels: state.filterYear === year ? monthArray : months,
-    datasets: [
-      {
-        label: "Target",
-        data: sums.Target.map((value) => round(value)),
-        backgroundColor: "#3b71ca",
-        borderColor: "#3b71ca",
-        borderWidth: 1,
-      },
-      {
-        label: "Actual",
-        data: sums.Actual.map((value) => round(value)),
-        backgroundColor: "#00b541",
-        borderColor: "#00b541",
-        borderWidth: 1,
-      },
-    ],
+
+    const target = sums.Target.map((value) => round(value));
+    const actual = sums.Actual.map((value) => round(value));
+
+    const newData = {
+      labels: new Date().getFullYear() === year ? monthArray : months,
+      datasets: [
+        {
+          label: "Target",
+          data: target,
+          backgroundColor: "#3b71ca",
+          borderColor: "#3b71ca",
+          borderWidth: 1,
+        },
+        {
+          label: "Actual",
+          data: actual,
+          backgroundColor: "#00b541",
+          borderColor: "#00b541",
+          borderWidth: 1,
+        },
+      ],
+    };
+
+    // Assuming you have a state variable called setDataState to set the data
+    setData(newData);
   };
+
+
+
+  useEffect(() => {
+    const year = filterYear; // You can set the year dynamically or from some state
+
+    const fetchData = async () => {
+      setOpenLoad(true);
+      await getList();
+      const dataDepartements = await fetchDataForDepartment(year);
+      await calculateSumsAndSetData(dataDepartements, year);
+      setOpenLoad(false);
+    };
+
+    fetchData();
+  }, [filterYear]); // The empty dependency array ensures that the effect runs only once when the component mounts
+
   return (
     <div>
       <Header />
       <div className="right-content">
         <Backdrop
           sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={state.openLoad}
+          open={openLoad}
         >
           <CircularProgress color="inherit" />
         </Backdrop>
@@ -337,14 +317,9 @@ const AdminDashboard = (props) => {
               className="input-style"
               size="small"
               displayEmpty
-              value={state.filterYear}
+              value={filterYear}
               onChange={(e) => {
-                setState(prevState => ({
-                  ...prevState,
-                  filterYear: e.target.value,
-                }));
-
-                getList(e.target.value);
+                setFilterYear(e.target.value);
               }}
               input={<OutlinedInput />}
               renderValue={(selected) => {
@@ -371,7 +346,7 @@ const AdminDashboard = (props) => {
           <div className="row">
             <div className="label-detail">
               <span style={{ fontSize: "1.2rem" }}>
-                {state.filterYear} Cash-in Target :{" "}
+                {filterYear} Cash-in Target :{" "}
                 {state.detailDashboard.cashInTarget
                   ? state.detailDashboard.cashInTarget
                   : 0}{" "}
@@ -427,12 +402,12 @@ const AdminDashboard = (props) => {
                   },
                 },
               }}
-              tittle={`Target Cash-in vs Actual ${state.filterYear} (in billion Rp.)`}
+              tittle={`Target Cash-in vs Actual ${filterYear} (in billion Rp.)`}
               data={data}
             />
             <div className="margin-3-right">
               <label className="label-tittle">
-                {state.filterYear} Cash-in Target Breakdown
+                {filterYear} Cash-in Target Breakdown
               </label>
               <ArrowLabel
                 tittle="Existing Customer"
@@ -464,18 +439,18 @@ const AdminDashboard = (props) => {
             </div>
           </div>
           <div className="row">
-            {state.dataDepartements.map((departement1, index) => (
+            {dataDepartements.map((departement1, index) => (
               <LabelContainer
                 key={departement1.id}
                 tittle={departement1.name}
                 id={departement1.id}
                 boxColor={index == 0 ? "#00b541" : index === 1 ? "#0070c6" : "#7b24a6"}
-                year={state.filterYear}
+                year={filterYear}
               />
             ))}
           </div>
           <div className="row">
-            {state.dataDepartements.map((departement1, index) => (
+            {dataDepartements.map((departement1, index) => (
               <BarChart
                 key={"bar-chart-" + departement1.id}
                 options={optionHorizontal.options}
