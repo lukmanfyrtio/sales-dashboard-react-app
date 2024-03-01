@@ -6,7 +6,6 @@ import AdminDashboard from './pages/AdminDashboard';
 import SuccessLogin from './pages/SuccessLogin.jsx';
 import { useAuthContext } from '@asgardeo/auth-react';
 import DetailDashboard from './pages/DetailDashboard.jsx';
-import CustomerUpload from './pages/SalesLeadsUploadForm.jsx';
 import SalesLeadsPage from './pages/SalesLeadsPage.jsx';
 import SalesRevenuePage from './pages/SalesRevenuePage.jsx';
 import CompanyTargetPage from './pages/CompanyTargetPage.jsx';
@@ -16,6 +15,8 @@ import CompanyTargetForm from './pages/CompanyTargetForm.jsx';
 import SalesLeadsUploadForm from './pages/SalesLeadsUploadForm.jsx';
 import DepartmentPage from './pages/DepartmentPage.jsx';
 import ProductPage from './pages/ProductPage.jsx';
+import DepartmentForm from './pages/DepartmentForm.jsx';
+import ProductForm from './pages/ProductForm.jsx';
 
 
 
@@ -53,7 +54,12 @@ function App() {
 
 
               <Route exact path="/department" element={<DepartmentPage />} />
+              <Route exact path="/department/edit" element={<DepartmentForm />} />
+              <Route exact path="/department/add" element={<DepartmentForm />} />
+
               <Route exact path="/product" element={<ProductPage />} />
+              <Route exact path="/product/edit" element={<ProductForm />} />
+              <Route exact path="/product/add" element={<ProductForm />} />
 
               <Route exact path="/login" element={<SuccessLogin />} />
             </>

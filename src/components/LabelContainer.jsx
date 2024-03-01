@@ -32,15 +32,6 @@ function LabelContainer(props) {
     <div
       className="box-content"
       onClick={() => {
-        if(localStorage.bup===tittle){
-        navigate("/dashboard/detail", {
-          state: {
-            tittle,
-            year:year
-          },
-        });
-      }else{
-        if(localStorage.bup==="ALL"){
           navigate("/dashboard/detail", {
             state: {
               tittle,
@@ -48,10 +39,6 @@ function LabelContainer(props) {
               id:id
             },
           });
-        }else{
-        navigate("/403");
-        }
-      }
       }}
     >
       <div

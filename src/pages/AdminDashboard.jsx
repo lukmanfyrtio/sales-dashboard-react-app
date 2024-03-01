@@ -269,7 +269,6 @@ const AdminDashboard = (props) => {
   };
 
   useEffect(() => {
-    console.log("masukk");
     setState(prevState => ({
       ...prevState,
       openLoad: true,

@@ -120,7 +120,7 @@ function DepartmentPage() {
 
   const getList = () => {
     axios
-      .get(apis.server + "/departments", {
+      .get(apis.server + "/departments/filter", {
         params: {
           search: Search ? Search : null,
           page: page,
@@ -274,7 +274,7 @@ function DepartmentPage() {
               className="button-c"
               onClick={() => {
                 if (create == 1) {
-                  navigate("/departments/add");
+                  navigate("/department/add");
                 } else {
                   navigate("/403");
                 }
@@ -367,7 +367,7 @@ function DepartmentPage() {
                           color="primary"
                           onClick={(_) => {
                             if (update === 1) {
-                              navigate("/departments/edit", {
+                              navigate("/department/edit", {
                                 state: {
                                   sales: row,
                                 },

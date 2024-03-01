@@ -184,6 +184,7 @@ function CompanyTargetForm() {
       setAlertMessage("Please fill in all required fields");
       return;
     }
+    setAlertMessage(null);
     axios({
       method: `${isEdit
         ? `put`

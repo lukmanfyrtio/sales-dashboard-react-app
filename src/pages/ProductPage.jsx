@@ -121,7 +121,7 @@ function ProductPage() {
 
   const getList = () => {
     axios
-      .get(apis.server + "/products", {
+      .get(apis.server + "/products/filter", {
         params: {
           search: Search ? Search : null,
           page: page,

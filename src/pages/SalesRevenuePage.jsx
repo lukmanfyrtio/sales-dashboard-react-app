@@ -284,10 +284,10 @@ function SalesRevenuePage() {
             >
               <CircularProgress color="inherit" />
             </Backdrop>
-            {localStorage.bup === "ALL" ? (
+            {
               <FormControl sx={{ m: 0, width: 200, mt: 0 }}>
                 <Select
-                  id="BUP"
+                  id="unit"
                   className="input-style"
                   size="small"
                   displayEmpty
@@ -313,9 +313,7 @@ function SalesRevenuePage() {
                   ))}
                 </Select>
               </FormControl>
-            ) : (
-              ""
-            )}
+            }
             <div className="search-bar  input-style">
               <input
                 type="search"

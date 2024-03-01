@@ -153,10 +153,9 @@ function CompanyTargetPage() {
         <div className="tittle-content">Target & Existing</div>
         <div className="row center-row">
           <div className="filter-row">
-            {localStorage.bup === "ALL" ?
               <FormControl sx={{ m: 0, width: 200, mt: 0 }}>
                 <Select
-                  id="BUP"
+                  id="unit"
                   className="input-style"
                   size="small"
                   displayEmpty
@@ -182,7 +181,6 @@ function CompanyTargetPage() {
                   ))}
                 </Select>
               </FormControl>
-              : ""}
 
             <div className="search-bar  input-style">
               <input
