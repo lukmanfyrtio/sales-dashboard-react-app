@@ -221,7 +221,11 @@ function SalesRevenueForm(props) {
       setAlertMessage("Please fill in all required fields");
       return;
     }
-
+    const modifiedSalesRevenue = {
+      ...salesRevenue,
+      principalReceipt: salesRevenue.principalReceipt.replace(/^\Rp\. /, "").replace(/\./g, ""),
+    };
+    console.log(modifiedSalesRevenue);
     axios({
       method: `${isEdit
         ? `put`
@@ -231,7 +235,7 @@ function SalesRevenueForm(props) {
         ? `${apis.server}/sales-revenue/${salesRevenue.id}`
         : apis.server + "/sales-revenue"
         }`,
-      data: salesRevenue,
+      data: modifiedSalesRevenue,
       headers: {
         Authorization: `Bearer ${localStorage.token ? localStorage.token : ""}`,
       },
@@ -312,6 +316,51 @@ function SalesRevenueForm(props) {
               <div className="column-form">
 
                 <div className="input-i">
+                  <label>Leads</label>
+                  <div>
+                    <FormControl sx={{ m: 0, width: 200, mt: 0 }}>
+                      <Select
+                        id="sales-leads"
+                        className="input-style"
+                        size="small"
+                        displayEmpty
+                        value={salesLeadsName.split("@")[0]}
+                        onChange={(e) => {
+                          console.log(e.target);
+                          console.log(e.dataset);
+                          const found = salesLeadLists.find((leads) => leads.potentialCustomer+"@"+leads.id === e.target.value);
+                          setSalesLeadsId(found?.id)
+                          setSalesLeadsName(found?.potentialCustomer+"@"+found?.id);
+                          setDepartmentId(found?.product?.department?.id);
+                          setDepartmentName(found?.product?.department?.name)
+                          updateSalesLeads(found);
+                          updateDepartment(found?.product?.department);
+                        }}
+                        input={<OutlinedInput />}
+                        renderValue={(selected) => {
+                          if (selected) {
+                            return (
+                              <label style={getStyles()}>{selected}</label>
+                            );
+                          }
+                          return <em style={getStyles()}>Pilih</em>;
+                        }}
+                        MenuProps={MenuProps}
+                        inputProps={{ "aria-label": "Without label" }}
+                      >
+                       <MenuItem key="unit data" value="unit data" style={getStyles()}>
+                          <em>Pilih Sales Leads</em>
+                        </MenuItem>
+                        {salesLeadLists.map((lead) => (
+                          <MenuItem key={lead.id} data-value="250" value={lead.potentialCustomer+"@"+lead.id} name="koyo" style={getStyles()}>
+                            {lead.potentialCustomer}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </div>
+                </div>
+                <div className="input-i">
                   <label>Unit/Department</label>
                   <div className="input-i-txt">
                     <FormControl fullWidth>
@@ -364,56 +413,10 @@ function SalesRevenueForm(props) {
                 </div>
 
                 <div className="input-i">
-                  <label>Leads</label>
-                  <div>
-                    <FormControl sx={{ m: 0, width: 200, mt: 0 }}>
-                      <Select
-                        id="sales-leads"
-                        className="input-style"
-                        size="small"
-                        displayEmpty
-                        value={salesLeadsName.split("@")[0]}
-                        onChange={(e) => {
-                          console.log(e.target);
-                          console.log(e.dataset);
-                          const found = salesLeadLists.find((leads) => leads.potentialCustomer+"@"+leads.id === e.target.value);
-                          setSalesLeadsId(found?.id)
-                          setSalesLeadsName(found?.potentialCustomer+"@"+found?.id);
-                          setDepartmentId(found?.product?.department?.id);
-                          setDepartmentName(found?.product?.department?.name)
-                          updateSalesLeads(found);
-                          updateDepartment(found?.product?.department);
-                        }}
-                        input={<OutlinedInput />}
-                        renderValue={(selected) => {
-                          if (selected) {
-                            return (
-                              <label style={getStyles()}>{selected}</label>
-                            );
-                          }
-                          return <em style={getStyles()}>Pilih</em>;
-                        }}
-                        MenuProps={MenuProps}
-                        inputProps={{ "aria-label": "Without label" }}
-                      >
-                       <MenuItem key="unit data" value="unit data" style={getStyles()}>
-                          <em>Pilih Sales Leads</em>
-                        </MenuItem>
-                        {salesLeadLists.map((lead) => (
-                          <MenuItem key={lead.id} data-value="250" value={lead.potentialCustomer+"@"+lead.id} name="koyo" style={getStyles()}>
-                            {lead.potentialCustomer}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </div>
-                </div>
-
-                <div className="input-i">
                   <label>Invoice Number </label>
                   <div className="input-i-txt">
                     <input
-                      onChange={(e) => setKeyValue('invoiceNumber', e.target.value)}
+                      onChange={(e) => setKeyValue('invoiceNumber', e.target.value.toUpperCase())}
                       value={salesRevenue.invoiceNumber}
                     ></input>
                     <label
